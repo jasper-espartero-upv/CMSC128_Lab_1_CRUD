@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edit Task</title>
+</head>
+
+<body>
+
+    <h1>Edit Task</h1>
+
+    <p>{{ todo["title"] }}</p>
+    <form action="/update/{{ todo['id'] }}" method="POST">
+
+    <label for="title">Enter Task Title:</label>
+    <input type="text" name="title" id="title"
+           placeholder="Enter a task"
+           value="{{ todo['title'] }}" required>
+    <br>
+
+    <label for="due_date">Due Date:</label>
+    <input type="datetime-local" name="due_date" id="due_date"
+           value="{{ todo['due_date'] }}">
+    <br>
+
+    <label for="priority">Priority level:</label>
+    <select name="priority" id="priority">
+
+        <option value="" {{ 'selected' if not todo['priority'] else '' }}>
+            -- choose priority--
+        </option>
+
+        <option value="LOW" {{ 'selected' if todo['priority'] == 'LOW' else '' }}>
+            Low
+        </option>
+
+        <option value="MED" {{ 'selected' if todo['priority'] == 'MED' else '' }}>
+            Medium
+        </option>
+
+        <option value="HIGH" {{ 'selected' if todo['priority'] == 'HIGH' else '' }}>
+            High
+        </option>
+
+    </select>
+    <br>
+
+    <label for="category">Category:</label>
+    <select name="category" id="category">
+
+        <option value="" {{ 'selected' if not todo['category'] else '' }}>
+            -- choose category--
+        </option>
+
+        <option value="School" {{ 'selected' if todo['category'] == 'School' else '' }}>
+            School
+        </option>
+
+        <option value="Personal" {{ 'selected' if todo['category'] == 'Personal' else '' }}>
+            Personal
+        </option>
+
+        <option value="Others" {{ 'selected' if todo['category'] == 'Others' else '' }}>
+            Others
+        </option>
+
+    </select>
+    <br>
+
+    <button type="submit">Update</button>
+
+</form>
+    
+
+
+</body>
+</html>

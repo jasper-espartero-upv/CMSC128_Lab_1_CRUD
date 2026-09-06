@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>To-Do List</title>
+</head>
+
+<body>
+
+    <h1>My To-Do List</h1>
+
+    <form action="/add" method="POST">
+        <label for="title"> Enter Task Title:</label>
+        <input type="text" name="title" id="title" placeholder="Enter a task" required> <br>
+
+        <label for="due_date"> Due Date:</label>
+        <input type="datetime-local" name="due_date" id="due_date" placeholder="Enter due date"> <br>
+
+        <label for="priority">Priority level:</label>
+        <select name="priority" id="priority">
+            <option value="">-- choose priority--</option>
+            <option value="LOW">Low</option>
+            <option value="MED">Medium</option>
+            <option value="HIGH">High</option>
+        </select> <br>
+
+        <label for="category">Category:</label>
+        <select name="category" id="category">
+            <option value="">-- choose category--</option>
+            <option value="School">School</option>
+            <option value="Personal">Personal</option>
+            <option value="Others">Others</option>
+        </select> <br>
+
+        <button type="submit">Add</button> <br>
+        
+    </form> 
+
+    <h2>Tasks</h2>
+
+    <ul>
+        {% for todo in todos %}
+            <li>
+                {{ todo["title"] }}
+
+                <form action="/delete/{{ todo['id'] }}" method="POST">
+                    <button type="submit">Delete</button>
+                </form>
+                <form action="/edit/{{ todo['id'] }}" method="GET">
+                    
+
+                    <button type="submit">Edit</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+
+</body>
+</html>
