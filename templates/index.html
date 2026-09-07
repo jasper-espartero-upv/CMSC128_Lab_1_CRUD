@@ -4,6 +4,14 @@
     <title>To-Do List</title>
 </head>
 
+{% with messages = get_flashed_messages() %}
+    {% for message in messages %}
+        <div id="success-notification">
+            {{ message }}
+        </div>
+    {% endfor %}
+{% endwith %}
+
 <body>
 
     <h1>My To-Do List</h1>
@@ -13,19 +21,19 @@
         <input type="text" name="title" id="title" placeholder="Enter a task" required> <br>
 
         <label for="due_date"> Due Date:</label>
-        <input type="datetime-local" name="due_date" id="due_date" placeholder="Enter due date"> <br>
+        <input type="datetime-local" name="due_date" id="due_date" placeholder="Enter due date" required> <br>
 
         <label for="priority">Priority level:</label>
-        <select name="priority" id="priority">
-            <option value="">-- choose priority--</option>
+        <select name="priority" id="priority" required>
+            <option disabled selected value="">-- choose priority--</option>
             <option value="LOW">Low</option>
             <option value="MED">Medium</option>
             <option value="HIGH">High</option>
         </select> <br>
 
-        <label for="category">Category:</label>
+        <label for="category">Category: required</label>
         <select name="category" id="category">
-            <option value="">-- choose category--</option>
+            <option disabled selected value="">-- choose category--</option>
             <option value="School">School</option>
             <option value="Personal">Personal</option>
             <option value="Others">Others</option>
@@ -33,26 +41,137 @@
 
         <button type="submit">Add</button> <br>
         
-    </form> 
+    </form>
+
+    {% if session.get("deleted_todo") %}
+        <div id="undo-notification">
+            Task deleted.
+            <form action="/undo" method="POST">
+                <button type="submit">Undo</button>
+            </form>
+        </div>
+    {% endif %}
 
     <h2>Tasks</h2>
+    <form action="/" method="GET">
+        <label for="sort">Sort by:</label>
+        <select name="sort" id="sort">
+            <option value="created_at" {% if sort == "created_at" %}selected{% endif %}>Date Added</option>
+            <option value="due_date" {% if sort == "due_date" %}selected{% endif %}>Due Date</option>
+            <option value="priority" {% if sort == "priority" %}selected{% endif %}>Priority</option>
+            <option value="category" {% if sort == "category" %}selected{% endif %}>Category</option>
+        </select>
+
+        <label for="priority">Filter by Priority:</label>
+        <select name="priority" id="priority">
+            <option value="" {% if priority == "" %}selected{% endif %}>All Priorities</option>
+            <option value="LOW" {% if priority == "LOW" %}selected{% endif %}>Low</option>
+            <option value="MED" {% if priority == "MED" %}selected{% endif %}>Medium</option>
+            <option value="HIGH" {% if priority == "HIGH" %}selected{% endif %}>High</option>
+        </select>
+
+        <label for="category">Filter by Category:</label>
+        <select name="category" id="category">
+            <option value="" {% if category == "" %}selected{% endif %}>All Categories</option>
+            <option value="School" {% if category == "School" %}selected{% endif %}>School</option>
+            <option value="Personal" {% if category == "Personal" %}selected{% endif %}>Personal</option>
+            <option value="Others" {% if category == "Others" %}selected{% endif %}>Others</option>
+        </select>
+
+        <button type="submit">Apply</button>
+    </form>
 
     <ul>
         {% for todo in todos %}
             <li>
-                {{ todo["title"] }}
+                <p>Title: {{ todo["title"] }}</p>
+                <form action="/status/{{ todo.id }}" method="POST">
+                    <input type="hidden" name="sort" value="{{ sort }}">
+                    <input type="hidden" name="priority" value="{{ priority }}">
+                    <input type="hidden" name="category" value="{{ category }}">
+
+                    {% if todo["completed"] == 1 %}
+                        <button type="submit" name="status" value="0" class="checkmark-btn completed">
+                            <span class="icon">✓</span> Completed
+                        </button>
+                    {% else %}
+                        <button type="submit" name="status" value="1" class="checkmark-btn incomplete">
+                            <span class="icon-empty">▢</span> Mark Completed
+                        </button>
+                    {% endif %}
+                </form>
+                <!-- /* Base button styles to make it look custom */
+                        .checkmark-btn {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 8px;
+                        padding: 8px 16px;
+                        font-size: 14px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        border: 1px solid transparent;
+                        transition: background-color 0.2s;
+                        }
+
+                        /* Style for when the item is COMPLETED */
+                        .checkmark-btn.completed {
+                        background-color: #28a745;
+                        color: white;
+                        }
+                        .checkmark-btn.completed:hover {
+                        background-color: #218838; /* Darker green on hover */
+                        }
+
+                        /* Style for when the item is INCOMPLETE */
+                        .checkmark-btn.incomplete {
+                        background-color: #f8f9fa;
+                        color: #495057;
+                        border-color: #ced4da;
+                        }
+                        .checkmark-btn.incomplete:hover {
+                        background-color: #e2e6ea; /* Darker gray on hover */
+                        }
+                    -->
+
+                
+                <p>Due Date: {{ todo["due_date"] }}</p>
+                <p>Priority: {{ todo["priority"] }}</p>
+                <p>Category: {{ todo["category"] }}</p>
+                <p> Date Added: {{ todo["created_at"] }}</p>
 
                 <form action="/delete/{{ todo['id'] }}" method="POST">
-                    <button type="submit">Delete</button>
+                    <button type="submit" onclick="return confirm('Are you sure you want to delete this task?')">
+                        Delete
+                    </button>
                 </form>
                 <form action="/edit/{{ todo['id'] }}" method="GET">
-                    
-
                     <button type="submit">Edit</button>
                 </form>
             </li>
         {% endfor %}
     </ul>
 
+<script>
+    const notification = document.getElementById("undo-notification");
+    if (notification) {
+        setTimeout(() => {
+            notification.remove();
+
+            fetch("/clear-undo", {
+                method: "POST"
+            });
+        }, 5000);
+    }
+
+    const successNotification = document.getElementById("success-notification");
+    if (successNotification) {
+        setTimeout(() => {
+            successNotification.remove();
+        }, 3000);
+    }
+</script>
+
 </body>
+
 </html>
+
