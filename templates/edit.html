@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Edit Task</title>
 </head>
@@ -65,6 +66,11 @@
 
     </select>
     <br>
+
+    <!-- Hidden Inputs for Sort & Filter -->
+    <input type="hidden" name="sort" value="{{ sort }}">
+    <input type="hidden" name="priority_filter" value="{{ priority }}">
+    <input type="hidden" name="category_filter" value="{{ category }}">
 
     <button type="submit">Update</button>
 

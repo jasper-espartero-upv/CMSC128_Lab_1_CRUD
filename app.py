@@ -82,22 +82,42 @@ def index():
 
 @app.route("/add", methods=["POST"])
 def add():
+
     title = request.form["title"]
     due_date = request.form["due_date"]
     priority = request.form["priority"]
     category = request.form["category"]
 
+    sort = request.args.get("sort", "")
+    priority_filter = request.args.get("priority", "")
+    category_filter = request.args.get("category", "")
+
     conn = get_db()
-    conn.execute("INSERT INTO todos (title, due_date, priority, category) VALUES (?, ?, ?, ?)", (title, due_date, priority, category) )
+
+    conn.execute(
+        "INSERT INTO todos (title, due_date, priority, category) VALUES (?, ?, ?, ?)",
+        (title, due_date, priority, category)
+    )
 
     conn.commit()
     conn.close()
+
     flash("Task added successfully!")
+
+    if sort or priority_filter or category_filter:
+        return redirect(
+            f"/?sort={sort}&priority={priority_filter}&category={category_filter}"
+        )
+    
     return redirect("/")
 
 @app.route("/delete/<int:id>", methods=["POST"])
 def delete(id):
     conn = get_db()
+
+    sort = request.form.get("sort", "")
+    priority_filter = request.form.get("priority_filter", "")
+    category_filter = request.form.get("category_filter", "")
 
     todo = conn.execute(
         "SELECT * FROM todos WHERE id = ?",
@@ -105,16 +125,29 @@ def delete(id):
     ).fetchone()
     session["deleted_todo"] = dict(todo)
 
+    session["undo_sort"] = sort
+    session["undo_priority"] = priority_filter
+    session["undo_category"] = category_filter
+
     conn.execute("DELETE FROM todos WHERE id = ?", (id,))
 
     conn.commit()
     conn.close()
+
+    if sort or priority_filter or category_filter:
+        return redirect(
+            f"/?sort={sort}&priority={priority_filter}&category={category_filter}"
+        )
+
     return redirect("/")
 
 @app.route("/undo", methods=["POST"])
 def undo():
-    todo = session.get("deleted_todo")
+    sort = session.get("undo_sort", "")
+    priority_filter = session.get("undo_priority", "")
+    category_filter = session.get("undo_category", "")
 
+    todo = session.get("deleted_todo")
     if todo:
         conn = get_db()
 
@@ -138,6 +171,15 @@ def undo():
 
         session.pop("deleted_todo")
 
+        session.pop("undo_sort", None)
+        session.pop("undo_priority", None)
+        session.pop("undo_category", None)
+
+    if sort or priority_filter or category_filter:
+        return redirect(
+            f"/?sort={sort}&priority={priority_filter}&category={category_filter}"
+        )
+
     return redirect("/")
 
 @app.route("/clear-undo", methods=["POST"])
@@ -150,7 +192,13 @@ def edit(id):
     conn = get_db()
     todo = conn.execute("SELECT * FROM todos WHERE id = ?", (id,)).fetchone()
 
-    return render_template("edit.html", todo=todo)
+    return render_template(
+        "edit.html",
+        todo=todo,
+        sort=request.args.get("sort", ""),
+        priority=request.args.get("priority", ""),
+        category=request.args.get("category", "")
+    )
 
 @app.route("/update/<int:id>", methods=["POST"])
 def update(id):
@@ -159,11 +207,23 @@ def update(id):
     priority = request.form["priority"]
     category = request.form["category"] 
 
+    sort = request.form.get("sort", "")
+    priority_filter = request.form.get("priority_filter", "")
+    category_filter = request.form.get("category_filter", "")
+
     conn = get_db()
     conn.execute("UPDATE todos SET title = ?, due_date = ?, priority = ?, category = ?  WHERE id = ?", (title, due_date, priority, category, id))
 
     conn.commit()
     conn.close()
+
+    flash("Task updated successfully!")
+
+    if sort or priority_filter or category_filter:
+        return redirect(
+            f"/?sort={sort}&priority={priority_filter}&category={category_filter}"
+        )
+
     return redirect("/")
 
 @app.route("/status/<int:id>", methods=["POST"])
