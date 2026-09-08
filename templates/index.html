@@ -53,29 +53,31 @@
     {% endif %}
 
     <h2>Tasks</h2>
+
+    <!-- Sort & Filter -->
     <form action="/" method="GET">
         <label for="sort">Sort by:</label>
         <select name="sort" id="sort">
-            <option value="created_at" {% if sort == "created_at" %}selected{% endif %}>Date Added</option>
-            <option value="due_date" {% if sort == "due_date" %}selected{% endif %}>Due Date</option>
-            <option value="priority" {% if sort == "priority" %}selected{% endif %}>Priority</option>
-            <option value="category" {% if sort == "category" %}selected{% endif %}>Category</option>
+            <option value="created_at" {% if sort == "created_at" %} selected {% endif %}>Date Added</option>
+            <option value="due_date" {% if sort == "due_date" %} selected {% endif %}>Due Date</option>
+            <option value="priority" {% if sort == "priority" %} selected {% endif %}>Priority</option>
+            <option value="category" {% if sort == "category" %} selected {% endif %}>Category</option>
         </select>
 
         <label for="priority">Filter by Priority:</label>
         <select name="priority" id="priority">
-            <option value="" {% if priority == "" %}selected{% endif %}>All Priorities</option>
-            <option value="LOW" {% if priority == "LOW" %}selected{% endif %}>Low</option>
-            <option value="MED" {% if priority == "MED" %}selected{% endif %}>Medium</option>
-            <option value="HIGH" {% if priority == "HIGH" %}selected{% endif %}>High</option>
+            <option value="" {% if priority == "" %} selected {% endif %}>All Priorities</option>
+            <option value="LOW" {% if priority == "LOW" %} selected {% endif %}>Low</option>
+            <option value="MED" {% if priority == "MED" %} selected {% endif %}>Medium</option>
+            <option value="HIGH" {% if priority == "HIGH" %} selected {% endif %}>High</option>
         </select>
 
         <label for="category">Filter by Category:</label>
         <select name="category" id="category">
-            <option value="" {% if category == "" %}selected{% endif %}>All Categories</option>
-            <option value="School" {% if category == "School" %}selected{% endif %}>School</option>
-            <option value="Personal" {% if category == "Personal" %}selected{% endif %}>Personal</option>
-            <option value="Others" {% if category == "Others" %}selected{% endif %}>Others</option>
+            <option value="" {% if category == "" %} selected {% endif %}>All Categories</option>
+            <option value="School" {% if category == "School" %} selected {% endif %}>School</option>
+            <option value="Personal" {% if category == "Personal" %} selected {% endif %}>Personal</option>
+            <option value="Others" {% if category == "Others" %} selected {% endif %}>Others</option>
         </select>
 
         <button type="submit">Apply</button>

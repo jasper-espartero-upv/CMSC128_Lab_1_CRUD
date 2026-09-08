@@ -1,8 +1,10 @@
 from flask import Flask, render_template, request, redirect, session, flash
 import sqlite3
+import os
+from dotenv import load_dotenv
 
 app = Flask(__name__)
-app.secret_key = "my-secret-key"
+app.secret_key = os.getenv("SECRET_KEY")
 
 # db connector
 def get_db():
@@ -34,9 +36,9 @@ def init_db():
 @app.route("/")
 def index():
     conn = get_db()
-    sort = request.args.get("sort")
-    priority = request.args.get("priority")
-    category = request.args.get("category")
+    sort = request.args.get("sort", "")
+    priority = request.args.get("priority", "")
+    category = request.args.get("category", "")
 
     sort_options = {
         "created_at": "created_at",
@@ -181,9 +183,12 @@ def updateCheckmark(id):
     conn.commit()
     conn.close()
 
-    return redirect(
-        f"/?sort={sort}&priority={priority}&category={category}"
-    )
+    if sort or priority or category:
+        return redirect(
+            f"/?sort={sort}&priority={priority}&category={category}"
+        )
+
+    return redirect("/")
 
 if __name__ == "__main__":
     init_db()
