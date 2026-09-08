@@ -2,57 +2,114 @@
 <html>
 <head>
     <title>To-Do List</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 
 {% with messages = get_flashed_messages() %}
     {% for message in messages %}
-        <div id="success-notification">
+        <div class="flash-popup">
             {{ message }}
         </div>
     {% endfor %}
 {% endwith %}
 
 <body>
+    <div class="modal" id="add-modal">
+
+        <div class="modal-content">
+
+            <button type="button" class="close-button" id="close-modal">
+                ×
+            </button>
+
+            <h2>Add Task</h2>
+
+            <form action="/add?sort={{ sort }}&priority={{ priority }}&category={{ category }}" method="POST">
+
+                <label>Title</label>
+                <input type="text" name="title" required>
+
+                <label>Due Date</label>
+                <input type="datetime-local" name="due_date">
+
+                <label>Priority</label>
+                <select name="priority">
+                    <option value="LOW">Low</option>
+                    <option value="MED">Medium</option>
+                    <option value="HIGH">High</option>
+                </select>
+
+                <label>Category</label>
+                <select name="category">
+                    <option value="School">School</option>
+                    <option value="Personal">Personal</option>
+                    <option value="Others">Others</option>
+                </select>
+
+                <button type="submit">Add Task</button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    <div class="modal" id="edit-modal">
+
+        <div class="modal-content">
+
+            <button type="button" class="close-button" id="close-edit-modal">
+                ×
+            </button>
+
+            <h2>Edit Task</h2>
+
+            <form id="edit-form" method="POST">
+
+                <label>Title</label>
+                <input type="text" name="title" id="edit-title" required>
+
+                <label>Due Date</label>
+                <input type="datetime-local" name="due_date" id="edit-due-date">
+
+                <label>Priority</label>
+                <select name="priority" id="edit-priority">
+                    <option value="LOW">Low</option>
+                    <option value="MED">Medium</option>
+                    <option value="HIGH">High</option>
+                </select>
+
+                <label>Category</label>
+                <select name="category" id="edit-category">
+                    <option value="School">School</option>
+                    <option value="Personal">Personal</option>
+                    <option value="Others">Others</option>
+                </select>
+
+                <input type="hidden" name="sort" value="{{ sort }}">
+                <input type="hidden" name="priority_filter" value="{{ priority }}">
+                <input type="hidden" name="category_filter" value="{{ category }}">
+
+                <button type="submit">Save Changes</button>
+
+            </form>
+
+        </div>
+
+    </div>
 
     <h1>My To-Do List</h1>
 
-    <form action="/add?sort={{ sort }}&priority={{ priority }}&category={{ category }}" method="POST">
-        <label for="title"> Enter Task Title:</label>
-        <input type="text" name="title" id="title" placeholder="Enter a task" required> <br>
-
-        <label for="due_date"> Due Date:</label>
-        <input type="datetime-local" name="due_date" id="due_date" placeholder="Enter due date" required> <br>
-
-        <label for="priority">Priority level:</label>
-        <select name="priority" id="priority" required>
-            <option disabled selected value="">-- choose priority--</option>
-            <option value="LOW">Low</option>
-            <option value="MED">Medium</option>
-            <option value="HIGH">High</option>
-        </select> <br>
-
-        <label for="category">Category: required</label>
-        <select name="category" id="category">
-            <option disabled selected value="">-- choose category--</option>
-            <option value="School">School</option>
-            <option value="Personal">Personal</option>
-            <option value="Others">Others</option>
-        </select> <br>
-
-        <button type="submit">Add</button> <br>
-        
-    </form>
-
     {% if session.get("deleted_todo") %}
-        <div id="undo-notification">
-            Task deleted.
+        <div class="undo-popup" id="undo-popup">
+            <span>Task deleted.</span>
+
             <form action="/undo" method="POST">
                 <button type="submit">Undo</button>
             </form>
         </div>
     {% endif %}
 
-    <h2>Tasks</h2>
 
     <!-- Sort & Filter -->
     <form action="/" method="GET">
@@ -83,90 +140,99 @@
         <button type="submit">Apply</button>
     </form>
 
-    <ul>
+    <ul class="task-list">
+        <li class="add-card" id="add-card">
+            +
+        </li>
         {% for todo in todos %}
-            <li>
-                <p>Title: {{ todo["title"] }}</p>
-                <form action="/status/{{ todo.id }}" method="POST">
+            <li class="task-card">
+                <div class="task-title-row">
+
+                    <form action="/status/{{ todo.id }}" method="POST">
+                        <input type="hidden" name="sort" value="{{ sort }}">
+                        <input type="hidden" name="priority" value="{{ priority }}">
+                        <input type="hidden" name="category" value="{{ category }}">
+
+                        {% if todo["completed"] == 1 %}
+                            <button type="submit" name="status" value="0" class="checkmark-btn completed">
+                                ✓
+                            </button>
+                        {% else %}
+                            <button type="submit" name="status" value="1" class="checkmark-btn incomplete">
+                                ✓
+                            </button>
+                        {% endif %}
+                    </form>
+
+                    <h3>{{ todo["title"] }}</h3>
+
+                </div>
+
                     <input type="hidden" name="sort" value="{{ sort }}">
                     <input type="hidden" name="priority" value="{{ priority }}">
                     <input type="hidden" name="category" value="{{ category }}">
-
-                    {% if todo["completed"] == 1 %}
-                        <button type="submit" name="status" value="0" class="checkmark-btn completed">
-                            <span class="icon">✓</span> Completed
-                        </button>
-                    {% else %}
-                        <button type="submit" name="status" value="1" class="checkmark-btn incomplete">
-                            <span class="icon-empty">▢</span> Mark Completed
-                        </button>
-                    {% endif %}
                 </form>
-                <!-- /* Base button styles to make it look custom */
-                        .checkmark-btn {
-                        display: inline-flex;
-                        align-items: center;
-                        gap: 8px;
-                        padding: 8px 16px;
-                        font-size: 14px;
-                        border-radius: 4px;
-                        cursor: pointer;
-                        border: 1px solid transparent;
-                        transition: background-color 0.2s;
-                        }
 
-                        /* Style for when the item is COMPLETED */
-                        .checkmark-btn.completed {
-                        background-color: #28a745;
-                        color: white;
-                        }
-                        .checkmark-btn.completed:hover {
-                        background-color: #218838; /* Darker green on hover */
-                        }
-
-                        /* Style for when the item is INCOMPLETE */
-                        .checkmark-btn.incomplete {
-                        background-color: #f8f9fa;
-                        color: #495057;
-                        border-color: #ced4da;
-                        }
-                        .checkmark-btn.incomplete:hover {
-                        background-color: #e2e6ea; /* Darker gray on hover */
-                        }
-                    -->
+                <p class="task-info">Due: {{ todo["due_date_display"] }}</p>
+                <p class="task-info">Added: {{ todo["created_at_display"] }}</p>
 
                 
-                <p>Due Date: {{ todo["due_date"] }}</p>
-                <p>Priority: {{ todo["priority"] }}</p>
-                <p>Category: {{ todo["category"] }}</p>
-                <p> Date Added: {{ todo["created_at"] }}</p>
+                <div class="task-attributes">
 
-                <form action="/delete/{{ todo['id'] }}" method="POST">
-                    <!-- Hidden Inputs for Sort & Filter -->
-                    <input type="hidden" name="sort" value="{{ sort }}">
-                    <input type="hidden" name="priority_filter" value="{{ priority }}">
-                    <input type="hidden" name="category_filter" value="{{ category }}">
-                    
-                    <button type="submit" onclick="return confirm('Are you sure you want to delete this task?')">
-                        Delete
-                    </button>
-                </form>
-                <form action="/edit/{{ todo['id'] }}" method="GET">
-                    <input type="hidden" name="sort" value="{{ sort }}">
-                    <input type="hidden" name="priority" value="{{ priority }}">
-                    <input type="hidden" name="category" value="{{ category }}">
+                    <p class="task-info">
+                        <span class="priority-badge {{ todo['priority'] }}">
+                            {{ todo["priority"] }} PRIO
+                        </span>
+                    </p>
 
-                    <button type="submit">Edit</button>
-                </form>
+                    <p class="task-info">
+                        <span class="category-badge {{ todo['category'] }}">
+                            {{ todo["category"] }}
+                        </span>
+                    </p>
+
+                </div>
+                
+
+                <div class="task-menu">
+                    <button type="button" class="menu-button">⋮</button>
+
+                    <div class="menu-options">
+
+                        <!-- Edit -->
+                        <button type="button"
+                                class="edit-button"
+                                data-id="{{ todo['id'] }}"
+                                data-title="{{ todo['title'] }}"
+                                data-due-date="{{ todo['due_date'] }}"
+                                data-priority="{{ todo['priority'] }}"
+                                data-category="{{ todo['category'] }}">
+                            Edit
+                        </button>
+
+                        <!-- Delete -->
+                        <form action="/delete/{{ todo['id'] }}" method="POST">
+                            <input type="hidden" name="sort" value="{{ sort }}">
+                            <input type="hidden" name="priority_filter" value="{{ priority }}">
+                            <input type="hidden" name="category_filter" value="{{ category }}">
+
+                            <button type="submit"
+                                    onclick="return confirm('Are you sure you want to delete this task?')">
+                                Delete
+                            </button>
+                        </form>
+
+                    </div>
+                </div>
             </li>
         {% endfor %}
     </ul>
 
 <script>
-    const notification = document.getElementById("undo-notification");
-    if (notification) {
+    const undoPopup = document.getElementById("undo-popup");
+    if (undoPopup) {
         setTimeout(() => {
-            notification.remove();
+            undoPopup.remove();
 
             fetch("/clear-undo", {
                 method: "POST"
@@ -174,12 +240,101 @@
         }, 5000);
     }
 
-    const successNotification = document.getElementById("success-notification");
-    if (successNotification) {
+    const flashPopup = document.querySelector(".flash-popup");
+    if (flashPopup) {
         setTimeout(() => {
-            successNotification.remove();
+            flashPopup.remove();
         }, 3000);
     }
+
+    const menuButtons = document.querySelectorAll(".menu-button");
+
+    menuButtons.forEach(button => {
+        button.addEventListener("click", (event) => {
+            event.stopPropagation();
+
+            const menu = button.parentElement;
+
+            document.querySelectorAll(".task-menu").forEach(otherMenu => {
+                if (otherMenu !== menu) {
+                    otherMenu.classList.remove("active");
+                }
+            });
+
+            menu.classList.toggle("active");
+        });
+    });
+
+    document.addEventListener("click", () => {
+        document.querySelectorAll(".task-menu").forEach(menu => {
+            menu.classList.remove("active");
+        });
+    });
+
+    const addCard = document.getElementById("add-card");
+    const addModal = document.getElementById("add-modal");
+    const closeModal = document.getElementById("close-modal");
+
+    addCard.addEventListener("click", () => {
+        addModal.style.display = "flex";
+    });
+
+    closeModal.addEventListener("click", () => {
+        addModal.style.display = "none";
+    });
+
+    addModal.addEventListener("click", (event) => {
+        if (event.target === addModal) {
+            addModal.style.display = "none";
+        }
+    });
+
+    const editButtons = document.querySelectorAll(".edit-button");
+
+    const editModal = document.getElementById("edit-modal");
+    const closeEditModal = document.getElementById("close-edit-modal");
+
+    const editForm = document.getElementById("edit-form");
+
+    const editTitle = document.getElementById("edit-title");
+    const editDueDate = document.getElementById("edit-due-date");
+    const editPriority = document.getElementById("edit-priority");
+    const editCategory = document.getElementById("edit-category");
+
+
+    editButtons.forEach(button => {
+
+        button.addEventListener("click", () => {
+
+            const id = button.dataset.id;
+
+            editTitle.value = button.dataset.title;
+            editDueDate.value = button.dataset.dueDate;
+            editPriority.value = button.dataset.priority;
+            editCategory.value = button.dataset.category;
+
+            editForm.action = `/update/${id}`;
+
+            editModal.style.display = "flex";
+
+        });
+
+    });
+
+
+    closeEditModal.addEventListener("click", () => {
+        editModal.style.display = "none";
+    });
+
+
+    editModal.addEventListener("click", (event) => {
+
+        if (event.target === editModal) {
+            editModal.style.display = "none";
+        }
+
+    });
+
 </script>
 
 </body>

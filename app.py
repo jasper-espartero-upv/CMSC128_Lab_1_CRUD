@@ -1,7 +1,8 @@
 from flask import Flask, render_template, request, redirect, session, flash
+from dotenv import load_dotenv
+from datetime import datetime
 import sqlite3
 import os
-from dotenv import load_dotenv
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
@@ -69,7 +70,22 @@ def index():
         query += " ORDER BY " + sort_column
 
     todos = conn.execute(query, params).fetchall()
-    
+
+    todos = [dict(todo) for todo in todos]
+
+    for todo in todos:
+        if todo["due_date"]:
+            todo["due_date_display"] = datetime.strptime(
+                todo["due_date"],
+                "%Y-%m-%dT%H:%M"
+            ).strftime("%B %d, %Y at %I:%M %p")
+
+        if todo["created_at"]:
+            todo["created_at_display"] = datetime.strptime(
+                todo["created_at"],
+                "%Y-%m-%d %H:%M:%S"
+            ).strftime("%B %d, %Y at %I:%M %p")
+        
     conn.close()
 
     return render_template(
@@ -186,19 +202,6 @@ def undo():
 def clear_undo():
     session.pop("deleted_todo", None)
     return ""
-
-@app.route("/edit/<int:id>", methods=["GET"])
-def edit(id):
-    conn = get_db()
-    todo = conn.execute("SELECT * FROM todos WHERE id = ?", (id,)).fetchone()
-
-    return render_template(
-        "edit.html",
-        todo=todo,
-        sort=request.args.get("sort", ""),
-        priority=request.args.get("priority", ""),
-        category=request.args.get("category", "")
-    )
 
 @app.route("/update/<int:id>", methods=["POST"])
 def update(id):
