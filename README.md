@@ -80,3 +80,14 @@ The application uses Flask routes to handle CRUD operations.
 | POST   | `/undo`        | Restores the most recently deleted task          |
 | POST   | `/status/<id>` | Marks a task as completed or incomplete          |
 | POST   | `/clear-undo`  | Clears the stored undo task                      |
+
+## Screenshots
+
+### Main Page
+![Main Page](screenshots/home.png)
+
+### Add Task
+![Add Task](screenshots/add-task.png)
+
+### Edit Task
+![Edit Task](screenshots/edit-task.png)
