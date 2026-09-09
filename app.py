@@ -112,9 +112,9 @@ def add():
     priority = request.form["priority"]
     category = request.form["category"]
 
-    sort = request.args.get("sort", "")
-    priority_filter = request.args.get("priority", "")
-    category_filter = request.args.get("category", "")
+    sort = request.form.get("sort", "")
+    priority_filter = request.form.get("priority_filter", "")
+    category_filter = request.form.get("category_filter", "")
 
     conn = get_db()
 

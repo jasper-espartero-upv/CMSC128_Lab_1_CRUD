@@ -36,7 +36,10 @@
             <h2>Add Task</h2>
 
             <!-- Add task form -->
-            <form action="/add?sort={{ sort }}&priority={{ priority }}&category={{ category }}" method="POST">
+            <form action="/add" method="POST">
+                <input type="hidden" name="sort" value="{{ sort }}">
+                <input type="hidden" name="priority_filter" value="{{ priority }}">
+                <input type="hidden" name="category_filter" value="{{ category }}">
 
                 <label>Title</label>
                 <input type="text" name="title" required>
