@@ -50,7 +50,7 @@ def index():
         "created_at": "created_at DESC",
         "due_date": "due_date ASC",
         "priority": "priority DESC",
-        "category": "category ASC"
+        "category": "category DESC"
     }
 
     sort_column = sort_options.get(sort)
