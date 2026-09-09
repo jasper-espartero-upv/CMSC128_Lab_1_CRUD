@@ -1,5 +1,7 @@
+// ==================== UNDO POPUP ====================
 
 const undoPopup = document.getElementById("undo-popup");
+
 if (undoPopup) {
     setTimeout(() => {
         undoPopup.remove();
@@ -10,12 +12,19 @@ if (undoPopup) {
     }, 5000);
 }
 
+
+// ==================== FLASH POPUP ====================
+
 const flashPopup = document.querySelector(".flash-popup");
+
 if (flashPopup) {
     setTimeout(() => {
         flashPopup.remove();
     }, 3000);
 }
+
+
+// ==================== TASK MENU ====================
 
 const menuButtons = document.querySelectorAll(".menu-button");
 
@@ -41,6 +50,9 @@ document.addEventListener("click", () => {
     });
 });
 
+
+// ==================== ADD MODAL ====================
+
 const addCard = document.getElementById("add-card");
 const addModal = document.getElementById("add-modal");
 const closeModal = document.getElementById("close-modal");
@@ -59,6 +71,9 @@ addModal.addEventListener("click", (event) => {
     }
 });
 
+
+// ==================== EDIT MODAL ====================
+
 const editButtons = document.querySelectorAll(".edit-button");
 
 const editModal = document.getElementById("edit-modal");
@@ -70,7 +85,6 @@ const editTitle = document.getElementById("edit-title");
 const editDueDate = document.getElementById("edit-due-date");
 const editPriority = document.getElementById("edit-priority");
 const editCategory = document.getElementById("edit-category");
-
 
 editButtons.forEach(button => {
 
@@ -91,11 +105,9 @@ editButtons.forEach(button => {
 
 });
 
-
 closeEditModal.addEventListener("click", () => {
     editModal.style.display = "none";
 });
-
 
 editModal.addEventListener("click", (event) => {
 
