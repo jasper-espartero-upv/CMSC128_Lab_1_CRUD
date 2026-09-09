@@ -1,6 +1,6 @@
 # To-Do List App
 
-A simple To-Do List web application that allows users to add, view, edit, delete, and mark tasks as completed. It also includes task sorting, filtering, and undo delete functionality.
+A simple To-Do List web application that allows users to add, view, edit, delete, and mark tasks as completed. It also includes task sorting, filtering, and undo delete functionalities.
 
 ## Tech Stack
 
