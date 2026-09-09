@@ -7,6 +7,9 @@ import os
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 
+
+# ==================== DATABASE ====================
+
 # db connector
 def get_db():
     conn = sqlite3.connect("todo.db")
@@ -32,6 +35,8 @@ def init_db():
     conn.commit()
     conn.close()
 
+
+# ==================== DISPLAY TASKS ====================
 
 # GET /
 @app.route("/")
@@ -67,7 +72,7 @@ def index():
         query += " WHERE " + " AND ".join(conditions)
 
     if sort_column:
-        query += " ORDER BY " + sort_column
+        query += " ORDER BY " + sort_column + " DESC"
 
     todos = conn.execute(query, params).fetchall()
 
@@ -95,6 +100,9 @@ def index():
         priority=priority,
         category=category
     )
+
+
+# ==================== ADD TASK ====================
 
 @app.route("/add", methods=["POST"])
 def add():
@@ -127,6 +135,9 @@ def add():
     
     return redirect("/")
 
+
+# ==================== DELETE TASK ====================
+
 @app.route("/delete/<int:id>", methods=["POST"])
 def delete(id):
     conn = get_db()
@@ -157,6 +168,9 @@ def delete(id):
 
     return redirect("/")
 
+
+# ==================== UNDO DELETE ====================
+
 @app.route("/undo", methods=["POST"])
 def undo():
     sort = session.get("undo_sort", "")
@@ -164,6 +178,7 @@ def undo():
     category_filter = session.get("undo_category", "")
 
     todo = session.get("deleted_todo")
+
     if todo:
         conn = get_db()
 
@@ -198,10 +213,16 @@ def undo():
 
     return redirect("/")
 
+
+# ==================== CLEAR UNDO ====================
+
 @app.route("/clear-undo", methods=["POST"])
 def clear_undo():
     session.pop("deleted_todo", None)
     return ""
+
+
+# ==================== UPDATE TASK ====================
 
 @app.route("/update/<int:id>", methods=["POST"])
 def update(id):
@@ -215,7 +236,11 @@ def update(id):
     category_filter = request.form.get("category_filter", "")
 
     conn = get_db()
-    conn.execute("UPDATE todos SET title = ?, due_date = ?, priority = ?, category = ?  WHERE id = ?", (title, due_date, priority, category, id))
+
+    conn.execute(
+        "UPDATE todos SET title = ?, due_date = ?, priority = ?, category = ? WHERE id = ?",
+        (title, due_date, priority, category, id)
+    )
 
     conn.commit()
     conn.close()
@@ -229,6 +254,9 @@ def update(id):
 
     return redirect("/")
 
+
+# ==================== UPDATE STATUS ====================
+
 @app.route("/status/<int:id>", methods=["POST"])
 def updateCheckmark(id):
     status = request.form["status"]
@@ -238,6 +266,7 @@ def updateCheckmark(id):
     category = request.form.get("category", "")
 
     conn = get_db()
+
     conn.execute(
         "UPDATE todos SET completed = ? WHERE id = ?",
         (status, id)
@@ -252,6 +281,9 @@ def updateCheckmark(id):
         )
 
     return redirect("/")
+
+
+# ==================== RUN APPLICATION ====================
 
 if __name__ == "__main__":
     init_db()
