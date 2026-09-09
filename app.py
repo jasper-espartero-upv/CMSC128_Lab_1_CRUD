@@ -47,10 +47,10 @@ def index():
     category = request.args.get("category", "")
 
     sort_options = {
-        "created_at": "created_at",
-        "due_date": "due_date",
-        "priority": "priority",
-        "category": "category"
+        "created_at": "created_at DESC",
+        "due_date": "due_date ASC",
+        "priority": "priority DESC",
+        "category": "category ASC"
     }
 
     sort_column = sort_options.get(sort)
@@ -72,7 +72,7 @@ def index():
         query += " WHERE " + " AND ".join(conditions)
 
     if sort_column:
-        query += " ORDER BY " + sort_column + " DESC"
+        query += " ORDER BY " + sort_column
 
     todos = conn.execute(query, params).fetchall()
 

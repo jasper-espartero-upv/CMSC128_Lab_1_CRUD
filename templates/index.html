@@ -42,7 +42,7 @@
                 <input type="text" name="title" required>
 
                 <label>Due Date</label>
-                <input type="datetime-local" name="due_date">
+                <input type="datetime-local" name="due_date" required>
 
                 <label>Priority</label>
                 <select name="priority">
@@ -87,7 +87,7 @@
                 <input type="text" name="title" id="edit-title" required>
 
                 <label>Due Date</label>
-                <input type="datetime-local" name="due_date" id="edit-due-date">
+                <input type="datetime-local" name="due_date" id="edit-due-date" required>
 
                 <label>Priority</label>
                 <select name="priority" id="edit-priority">
@@ -303,10 +303,6 @@
                     Due: {{ todo["due_date_display"] }}
                 </p>
 
-                <!-- Display formatted creation date -->
-                <p class="task-info">
-                    Added: {{ todo["created_at_display"] }}
-                </p>
 
 
                 <!-- Priority and category badges -->
