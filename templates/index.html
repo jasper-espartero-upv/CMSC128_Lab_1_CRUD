@@ -4,6 +4,10 @@
 
 <head>
     <title>To-Do List</title>
+    <p>
+        Welcome, {{ session["display_name"] }}!
+        <a href="/profile">Profile</a>
+    </p>
 
     <!-- Link external CSS file -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">

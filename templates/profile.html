@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Profile</title>
+</head>
+
+<body>
+
+    <h1>Profile</h1>
+
+    <p>Display Name: {{ user["display_name"] }}</p>
+    <p>Email: {{ user["email"] }}</p>
+
+    <a href="/">Back to To-Do List</a>
+
+    <form action="/logout" method="POST">
+        <button type="submit">Log Out</button>
+    </form>
+
+</body>
+
+</html>

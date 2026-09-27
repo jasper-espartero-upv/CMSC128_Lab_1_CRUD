@@ -418,12 +418,28 @@ def register():
 
     return render_template("register.html")
 
-@app.route("/logout")
+@app.route("/logout", methods=["POST"])
 def logout():
     session.pop("user_id", None)
     session.pop("display_name", None)
 
     return redirect("/login")
+
+@app.route("/profile")
+def profile():
+    if "user_id" not in session:
+        return redirect("/login")
+
+    conn = get_db()
+
+    user = conn.execute(
+        "SELECT * FROM users WHERE id = ?",
+        (session["user_id"],)
+    ).fetchone()
+
+    conn.close()
+
+    return render_template("profile.html", user=user)
 
 
 # ==================== RUN APPLICATION ====================
