@@ -9,10 +9,57 @@
 
     <h1>Profile</h1>
 
-    <p>Display Name: {{ user["display_name"] }}</p>
-    <p>Email: {{ user["email"] }}</p>
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
 
-    <a href="/">Back to To-Do List</a>
+    <form action="/profile" method="POST">
+
+        <label>Email</label>
+        <input
+            type="email"
+            name="email"
+            value="{{ user['email'] }}"
+            required
+        >
+
+        <label>Display Name</label>
+        <input
+            type="text"
+            name="display_name"
+            value="{{ user['display_name'] }}"
+            required
+        >
+
+        <h2>Change Password</h2>
+
+        <label>Current Password</label>
+        <input
+            type="password"
+            name="current_password"
+        >
+
+        <label>New Password</label>
+        <input
+            type="password"
+            name="new_password"
+        >
+
+        <label>Confirm New Password</label>
+        <input
+            type="password"
+            name="confirm_password"
+        >
+
+        <button type="submit">Save Changes</button>
+
+    </form>
+
+    <p>
+        <a href="/">Back to To-Do List</a>
+    </p>
 
     <form action="/logout" method="POST">
         <button type="submit">Log Out</button>

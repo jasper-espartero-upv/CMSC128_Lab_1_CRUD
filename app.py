@@ -357,6 +357,9 @@ def updateCheckmark(id):
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    if "user_id" in session:
+        return redirect("/")
+
     if request.method == "POST":
         email = request.form["email"]
         password = request.form["password"]
@@ -384,6 +387,9 @@ def login():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    if "user_id" in session:
+        return redirect("/")
+
     if request.method == "POST":
         email = request.form["email"]
         display_name = request.form["display_name"]
@@ -425,7 +431,7 @@ def logout():
 
     return redirect("/login")
 
-@app.route("/profile")
+@app.route("/profile", methods=["GET", "POST"])
 def profile():
     if "user_id" not in session:
         return redirect("/login")
@@ -437,10 +443,97 @@ def profile():
         (session["user_id"],)
     ).fetchone()
 
+    if request.method == "POST":
+        email = request.form["email"]
+        display_name = request.form["display_name"]
+
+        current_password = request.form["current_password"]
+        new_password = request.form["new_password"]
+        confirm_password = request.form["confirm_password"]
+
+        if not email or not display_name:
+            conn.close()
+            flash("Email and display name are required.")
+            return redirect("/profile")
+
+        existing_user = conn.execute(
+            "SELECT id FROM users WHERE email = ? AND id != ?",
+            (email, session["user_id"])
+        ).fetchone()
+
+        if existing_user:
+            conn.close()
+            flash("That email is already being used.")
+            return redirect("/profile")
+
+        if new_password or confirm_password or current_password:
+
+            if not current_password:
+                conn.close()
+                flash("Enter your current password to change your password.")
+                return redirect("/profile")
+
+            if not check_password_hash(user["password"], current_password):
+                conn.close()
+                flash("Current password is incorrect.")
+                return redirect("/profile")
+
+            if not new_password:
+                conn.close()
+                flash("Enter a new password.")
+                return redirect("/profile")
+
+            if len(new_password) < 8:
+                conn.close()
+                flash("New password must be at least 8 characters.")
+                return redirect("/profile")
+
+            if new_password != confirm_password:
+                conn.close()
+                flash("New passwords do not match.")
+                return redirect("/profile")
+
+            password_hash = generate_password_hash(new_password)
+
+            conn.execute(
+                """
+                UPDATE users
+                SET email = ?, display_name = ?, password = ?
+                WHERE id = ?
+                """,
+                (
+                    email,
+                    display_name,
+                    password_hash,
+                    session["user_id"]
+                )
+            )
+
+        else:
+            conn.execute(
+                """
+                UPDATE users
+                SET email = ?, display_name = ?
+                WHERE id = ?
+                """,
+                (
+                    email,
+                    display_name,
+                    session["user_id"]
+                )
+            )
+
+        conn.commit()
+        conn.close()
+
+        session["display_name"] = display_name
+
+        flash("Profile updated successfully!")
+        return redirect("/profile")
+
     conn.close()
 
     return render_template("profile.html", user=user)
-
 
 # ==================== RUN APPLICATION ====================
 
