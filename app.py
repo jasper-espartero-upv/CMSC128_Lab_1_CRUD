@@ -57,8 +57,8 @@ def index():
     if "user_id" not in session:
         return redirect("/login")
 
-
     conn = get_db()
+
     sort = request.args.get("sort", "")
     priority = request.args.get("priority", "")
     category = request.args.get("category", "")
@@ -67,13 +67,13 @@ def index():
         "created_at": "created_at DESC",
         "due_date": "due_date ASC",
         "priority": "priority DESC",
-        "category": "category DESC"
+        "category": "category ASC"
     }
 
     sort_column = sort_options.get(sort)
 
-    conditions = []
-    params = []
+    conditions = ["user_id = ?"]
+    params = [session["user_id"]]
 
     if priority:
         conditions.append("priority = ?")
@@ -83,11 +83,9 @@ def index():
         conditions.append("category = ?")
         params.append(category)
 
-    query = "SELECT * FROM todos WHERE user_id = ?"
-    params = [session["user_id"]]
+    query = "SELECT * FROM todos"
 
-    if conditions:
-        query += " AND " + " AND ".join(conditions)
+    query += " WHERE " + " AND ".join(conditions)
 
     if sort_column:
         query += " ORDER BY " + sort_column
@@ -108,7 +106,7 @@ def index():
                 todo["created_at"],
                 "%Y-%m-%d %H:%M:%S"
             ).strftime("%B %d, %Y at %I:%M %p")
-        
+
     conn.close()
 
     return render_template(
