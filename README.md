@@ -9,7 +9,6 @@ A Flask-based user authentication and profile management system with:
 * Profile viewing and editing
 * Password change
 * Forgot password and password reset through email
-* 8-character minimum password requirement
 
 ## Technology Stack
 
@@ -21,13 +20,39 @@ A Flask-based user authentication and profile management system with:
 
 ## Installation and Local Run
 
-Install the required packages:
+### Step 1: Clone the repository
+
+```bash
+git clone <repository-url>
+cd <repository-folder>
+```
+
+### Step 2: Create a virtual environment
+
+**Windows PowerShell:**
+
+```bash
+python -m venv venv
+```
+
+### Step 3: Activate the virtual environment
+
+**Windows PowerShell:**
+
+```bash
+.\venv\Scripts\Activate.ps1
+```
+
+
+### Step 4: Install the required packages
 
 ```bash
 pip install flask python-dotenv
 ```
 
-Create a `.env` file:
+### Step 5: Create the `.env` file
+
+Create a `.env` file in the project root directory:
 
 ```env
 SECRET_KEY=your_secret_key
@@ -37,13 +62,19 @@ MAIL_FROM=yourgmail@gmail.com
 RESET_BASE_URL=http://127.0.0.1:5000
 ```
 
-Run the application:
+The Gmail account and app password are used to send password reset emails.
+
+### Step 6: Run the application
+
+Make sure the virtual environment is still activated:
 
 ```bash
 python app.py
 ```
 
-Open:
+### Step 7: Open the application
+
+Open the following URL in a browser:
 
 ```text
 http://127.0.0.1:5000/login
