@@ -187,6 +187,7 @@ def logout():
 @app.route("/forgot-password", methods=["GET", "POST"])
 def forgot_password():
     if "user_id" in session:
+        flash("You are already logged in.")
         return redirect("/profile")
 
     if request.method == "POST":
