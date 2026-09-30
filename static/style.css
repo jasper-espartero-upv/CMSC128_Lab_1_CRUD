@@ -198,3 +198,9 @@ a:hover {
     color: #ffffff;
     border-color: #d93025;
 }
+
+button:disabled {
+    background: #dadce0;
+    color: #80868b;
+    cursor: not-allowed;
+}
