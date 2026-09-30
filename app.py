@@ -15,6 +15,15 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 
 
+@app.after_request
+def prevent_caching(response):
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+
+    return response
+
+
 # ==================== DATABASE ====================
 
 def get_db():
@@ -90,6 +99,7 @@ If you did not request a password reset, you can ignore this email.
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if "user_id" in session:
+        flash("You are already logged in.")
         return redirect("/profile")
 
     if request.method == "POST":
@@ -122,6 +132,7 @@ def login():
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if "user_id" in session:
+        flash("You are already logged in.")
         return redirect("/profile")
 
     if request.method == "POST":
@@ -370,6 +381,7 @@ def reset_password(token):
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
     if "user_id" not in session:
+        flash("Please log in first.")
         return redirect("/login")
 
     conn = get_db()
