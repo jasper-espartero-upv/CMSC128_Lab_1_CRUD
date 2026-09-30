@@ -15,15 +15,6 @@ app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
 
 
-@app.after_request
-def prevent_caching(response):
-    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
-    response.headers["Pragma"] = "no-cache"
-    response.headers["Expires"] = "0"
-
-    return response
-
-
 # ==================== DATABASE ====================
 
 def get_db():
@@ -177,7 +168,7 @@ def register():
 
         conn.close()
 
-        flash("Account created successfully!")
+        flash("Account created successfully! You may now login.")
         return redirect("/login")
 
     return render_template("register.html")
