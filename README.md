@@ -1,93 +1,71 @@
-# To-Do List App
+# CMSC 128 Lab 2
 
-A simple To-Do List web application that allows users to add, view, edit, delete, and mark tasks as completed. It also includes task sorting, filtering, and undo delete functionalities.
+## Application Description and Implemented Features
 
-## Tech Stack
+A Flask-based user authentication and profile management system with:
 
-* **Frontend:** HTML, CSS, JavaScript
+* User registration and login
+* Logout with confirmation popup
+* Profile viewing and editing
+* Password change
+* Forgot password and password reset through email
+* 8-character minimum password requirement
+
+## Technology Stack
+
+* **Frontend:** HTML, CSS, JavaScript, Jinja2
 * **Backend:** Python with Flask
 * **Database:** SQLite
+* **Authentication:** Flask sessions and Werkzeug password hashing
+* **Password Recovery:** Gmail SMTP
 
-### Why These Technologies?
+## Installation and Local Run
 
-**Flask** was chosen for the backend because it is lightweight, simple to set up, and provides the routing and request handling needed for a CRUD application.
-
-**SQLite** was chosen because it is a lightweight database that does not require a separate database server. It is suitable for a small application and allows tasks to persist even after the application is restarted.
-
-**HTML, CSS, and JavaScript** were used for the frontend because they provide the basic structure, styling, and interactive features of the application.
-
-## How to Run Locally
-
-### 1. Clone the repository
-
-```bash
-git clone <repository-url>
-cd CMSC128_Lab_1_CRUD
-```
-
-### 2. Create a virtual environment
-
-```bash
-python -m venv venv
-```
-
-### 3. Activate the virtual environment
-
-**Windows:**
-
-```bash
-venv\Scripts\activate
-```
-
-### 4. Install dependencies
+Install the required packages:
 
 ```bash
 pip install flask python-dotenv
 ```
 
-### 5. Set up the environment variable
-
-Create a `.env` file in the project root:
+Create a `.env` file:
 
 ```env
-SECRET_KEY=your-secret-key
+SECRET_KEY=your_secret_key
+MAIL_USERNAME=yourgmail@gmail.com
+MAIL_PASSWORD=your_gmail_app_password
+MAIL_FROM=yourgmail@gmail.com
+RESET_BASE_URL=http://127.0.0.1:5000
 ```
 
-### 6. Run the application
+Run the application:
 
 ```bash
 python app.py
 ```
 
-The application will be available at:
+Open:
 
 ```text
-http://127.0.0.1:5000
+http://127.0.0.1:5000/login
 ```
 
-The SQLite database (`todo.db`) is created automatically when the application is started.
+## Database Setup
 
-## CRUD Operations / API Endpoints
+The SQLite database and required tables are automatically created when the application starts. No manual migration or seed data is required.
 
-The application uses Flask routes to handle CRUD operations.
+## Routes and Operations
 
-| Method | Endpoint       | Description                                      |
-| ------ | -------------- | ------------------------------------------------ |
-| GET    | `/`            | Displays all tasks and handles sorting/filtering |
-| POST   | `/add`         | Adds a new task                                  |
-| POST   | `/update/<id>` | Updates an existing task                         |
-| POST   | `/delete/<id>` | Deletes a task                                   |
-| POST   | `/undo`        | Restores the most recently deleted task          |
-| POST   | `/status/<id>` | Marks a task as completed or incomplete          |
-| POST   | `/clear-undo`  | Clears the stored undo task                      |
+| Route                     | Method    | Purpose                 |
+| ------------------------- | --------- | ----------------------- |
+| `/login`                  | GET, POST | Log in                  |
+| `/register`               | GET, POST | Create an account       |
+| `/logout`                 | POST      | Log out                 |
+| `/forgot-password`        | GET, POST | Request password reset  |
+| `/reset-password/<token>` | GET, POST | Reset password          |
+| `/profile`                | GET, POST | View and update profile |
 
-## Screenshots
+## Session and Password Recovery
 
-### Main Page
-![Main Page](screenshots/home.png)
+Flask sessions store the logged-in user's ID. Protected pages check the session before allowing access.
 
-### Add Task
-![Add Task](screenshots/add-task.png)
-
-### Edit Task
-![Edit Task](screenshots/edit-task.png)
+Passwords are hashed using Werkzeug before being stored. Password reset tokens are generated securely, hashed in the database, expire after 15 minutes, and can only be used once. Reset links are sent through Gmail SMTP.
