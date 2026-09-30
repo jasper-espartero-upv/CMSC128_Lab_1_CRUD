@@ -1,0 +1,78 @@
+```html
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Profile</title>
+</head>
+
+<body>
+
+    <h1>Profile</h1>
+
+    {% with messages = get_flashed_messages() %}
+        {% for message in messages %}
+            <p>{{ message }}</p>
+        {% endfor %}
+    {% endwith %}
+
+    <form action="/profile" method="POST">
+
+        <h2>Account Information</h2>
+
+        <label for="display_name">Display Name</label>
+        <input
+            type="text"
+            id="display_name"
+            name="display_name"
+            value="{{ user['display_name'] }}"
+            required
+        >
+
+        <label for="email">Email</label>
+        <input
+            type="email"
+            id="email"
+            name="email"
+            value="{{ user['email'] }}"
+            required
+        >
+
+        <h2>Change Password</h2>
+
+        <label for="current_password">Current Password</label>
+        <input
+            type="password"
+            id="current_password"
+            name="current_password"
+        >
+
+        <label for="new_password">New Password</label>
+        <input
+            type="password"
+            id="new_password"
+            name="new_password"
+        >
+
+        <label for="confirm_password">Confirm New Password</label>
+        <input
+            type="password"
+            id="confirm_password"
+            name="confirm_password"
+        >
+
+        <button type="submit">
+            Save Changes
+        </button>
+
+    </form>
+
+    <form action="/logout" method="POST">
+        <button type="submit">
+            Logout
+        </button>
+    </form>
+
+</body>
+
+</html>
