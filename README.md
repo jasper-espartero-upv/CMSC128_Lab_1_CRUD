@@ -20,14 +20,14 @@ A Flask-based user authentication and profile management system with:
 
 ## Installation and Local Run
 
-### Step 1: Clone the repository
+### 1. Clone the repository
 
 ```bash
 git clone <repository-url>
 cd <repository-folder>
 ```
 
-### Step 2: Create a virtual environment
+### 2. Create a virtual environment
 
 **Windows PowerShell:**
 
@@ -35,7 +35,7 @@ cd <repository-folder>
 python -m venv venv
 ```
 
-### Step 3: Activate the virtual environment
+### 3. Activate the virtual environment
 
 **Windows PowerShell:**
 
@@ -44,13 +44,13 @@ python -m venv venv
 ```
 
 
-### Step 4: Install the required packages
+### 4. Install the required packages
 
 ```bash
 pip install flask python-dotenv
 ```
 
-### Step 5: Create the `.env` file
+### 5. Create the `.env` file
 
 Create a `.env` file in the project root directory:
 
@@ -64,7 +64,7 @@ RESET_BASE_URL=http://127.0.0.1:5000
 
 The Gmail account and app password are used to send password reset emails.
 
-### Step 6: Run the application
+### 6. Run the application
 
 Make sure the virtual environment is still activated:
 
@@ -72,7 +72,7 @@ Make sure the virtual environment is still activated:
 python app.py
 ```
 
-### Step 7: Open the application
+### 7. Open the application
 
 Open the following URL in a browser:
 
