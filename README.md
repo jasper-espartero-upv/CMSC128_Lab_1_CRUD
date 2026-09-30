@@ -55,14 +55,14 @@ The SQLite database and required tables are automatically created when the appli
 
 ## Routes and Operations
 
-| Route                     | Method    | Purpose                 |
-| ------------------------- | --------- | ----------------------- |
-| `/login`                  | GET, POST | Log in                  |
-| `/register`               | GET, POST | Create an account       |
-| `/logout`                 | POST      | Log out                 |
-| `/forgot-password`        | GET, POST | Request password reset  |
-| `/reset-password/<token>` | GET, POST | Reset password          |
-| `/profile`                | GET, POST | View and update profile |
+| Method    | Endpoint                  | Description                        |
+| --------- | ------------------------- | ---------------------------------- |
+| GET, POST | `/login`                  | Log in to an account               |
+| GET, POST | `/register`               | Create a new account               |
+| POST      | `/logout`                 | Log out of the current account     |
+| GET, POST | `/forgot-password`        | Request a password reset           |
+| GET, POST | `/reset-password/<token>` | Reset the account password         |
+| GET, POST | `/profile`                | View and update the user's profile |
 
 ## Session and Password Recovery
 
