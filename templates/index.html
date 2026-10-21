@@ -3,7 +3,13 @@
 <html>
 
 <head>
-    <title>To-Do List</title>
+    <title>
+        {% if selected_list_name == "Personal" %}
+            My To-Do List
+        {% else %}
+            {{ selected_list_owner_name }}'s Group To-Do List
+        {% endif %}
+    </title>
 
     <!-- Link external CSS file -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
@@ -120,18 +126,128 @@
     </div>
 
 
-    <!-- ==================== PAGE TITLE ==================== -->
+
+    <!-- ==================== PAGE HEADER ==================== -->
 
     <div class="page-header">
-        <h1>My To-Do List</h1>
 
-        <a href="/profile" class="profile-button">
-            <img src="{{ url_for('static', filename='images/profile_icon.png') }}"
-                alt=""
-                class="profile-icon">
-            <span>My Profile</span>
-        </a>
+        <div class="list-title-container">
+
+            <h1 id="list-title">
+                {% if selected_list_name == "Personal" %}
+                    My To-Do List
+                {% else %}
+                    {{ selected_list_owner_name }}'s Group To-Do List
+                {% endif %}
+            </h1>
+
+            <!-- Dropdown Button and Menu -->
+            <div class="dropdown-wrapper">
+
+                <button type="button"
+                        id="list-dropdown-button"
+                        class="list-dropdown-button">
+                    ▼
+                </button>
+
+                <div class="list-dropdown-menu" id="list-dropdown-menu">
+                    {% for list in available_lists %}
+                        <a href="{{ url_for('index', list_id=list['id']) }}">
+                            {% if list['name'] == "Personal" %}
+                                My To-Do List
+                            {% else %}
+                                {{ list['owner_name'] }}'s Group To-Do List
+                            {% endif %}
+                        </a>
+                    {% endfor %}
+                </div>
+
+            </div>
+
+            <!-- Add People Button -->
+            {% if selected_list_name == "Collaborative" and is_list_owner %}
+                <button type="button"
+                        id="open-collaborator-modal"
+                        class="profile-button add-people-button"
+                        aria-label="Add People"
+                        title="Add People">
+                    <img src="{{ url_for('static', filename='images/add_people_icon.png') }}"
+                        alt="">
+                </button>
+            {% endif %}
+
+        </div>
+
+        <!-- My Profile -->
+        <div class="header-actions">
+            <a href="/profile" class="profile-button">
+                <img src="{{ url_for('static', filename='images/profile_icon.png') }}"
+                    alt=""
+                    class="profile-icon">
+                <span>My Profile</span>
+            </a>
+        </div>
+
     </div>
+    
+{% if selected_list_name == "Collaborative" and is_list_owner %}
+<div id="collaborator-modal" class="modal-overlay">
+    <div class="modal-content collaborator-modal-content">
+        <button type="button"
+                id="close-collaborator-modal"
+                class="modal-close"
+                aria-label="Close">
+            &times;
+        </button>
+
+        <h2>Add People</h2>
+        <p>Invite someone to collaborate on your to-do list.</p>
+
+        <!-- Current group members -->
+        <div class="group-members-section">
+            <h3>People in this group</h3>
+
+            <div class="group-members-list">
+                {% for member in group_members %}
+                    <div class="group-member">
+                        <div class="group-member-info">
+                            <span class="group-member-name">
+                                {{ member["display_name"] }}
+                            </span>
+
+                            <span class="group-member-role">
+                                {% if member["role"] == "owner" %}
+                                    Owner
+                                {% else %}
+                                    Member
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                {% else %}
+                    <p>No members found.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <form action="/collaborative/invite" method="POST">
+            <label for="collaborator-email">Email address</label>
+            <input
+                type="email"
+                id="collaborator-email"
+                name="email"
+                placeholder="Enter their email address"
+                required
+            >
+
+            <button type="submit" class="collaborator-submit">
+                Send Invitation
+            </button>
+        </form>
+    </div>
+</div>
+{% endif %}
+
 
 
     <!-- ==================== UNDO DELETE POPUP ==================== -->

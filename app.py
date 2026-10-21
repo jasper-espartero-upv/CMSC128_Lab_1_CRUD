@@ -50,6 +50,29 @@ def init_db():
     """)
 
     conn.execute("""
+        CREATE TABLE IF NOT EXISTS todo_lists (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            owner_id INTEGER NOT NULL,
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (owner_id) REFERENCES users(id)
+        )
+    """)
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS todo_list_members (
+            list_id INTEGER NOT NULL,
+            user_id INTEGER NOT NULL,
+            role TEXT NOT NULL DEFAULT 'member',
+            PRIMARY KEY (list_id, user_id),
+            FOREIGN KEY (list_id) REFERENCES todo_lists(id)
+                ON DELETE CASCADE,
+            FOREIGN KEY (user_id) REFERENCES users(id)
+                ON DELETE CASCADE
+        )
+    """)
+
+    conn.execute("""
         CREATE TABLE IF NOT EXISTS todos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT NOT NULL,
@@ -60,9 +83,67 @@ def init_db():
                 category IN ('School', 'Personal', 'Others')
             ),
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            user_id INTEGER REFERENCES users(id)
+            user_id INTEGER REFERENCES users(id),
+            list_id INTEGER REFERENCES todo_lists(id)
         )
     """)
+
+    # Give every existing user a Personal list.
+    users = conn.execute("SELECT id FROM users").fetchall()
+
+    for user in users:
+        user_id = user["id"]
+
+        personal_list = conn.execute("""
+            SELECT id FROM todo_lists
+            WHERE owner_id = ? AND name = 'Personal'
+            LIMIT 1
+        """, (user_id,)).fetchone()
+
+        if personal_list is None:
+            cursor = conn.execute("""
+                INSERT INTO todo_lists (name, owner_id)
+                VALUES ('Personal', ?)
+            """, (user_id,))
+            personal_list_id = cursor.lastrowid
+        else:
+            personal_list_id = personal_list["id"]
+
+        # Give the owner access through the membership table.
+        conn.execute("""
+            INSERT OR IGNORE INTO todo_list_members
+                (list_id, user_id, role)
+            VALUES (?, ?, 'owner')
+        """, (personal_list_id, user_id))
+
+        # Keep existing tasks in their owner's Personal list.
+        conn.execute("""
+            UPDATE todos
+            SET list_id = ?
+            WHERE user_id = ? AND list_id IS NULL
+        """, (personal_list_id, user_id))
+
+        collaborative_list = conn.execute("""
+            SELECT id FROM todo_lists
+            WHERE owner_id = ? AND name = 'Collaborative'
+            LIMIT 1
+        """, (user_id,)).fetchone()
+
+        if collaborative_list is None:
+            cursor = conn.execute("""
+                INSERT INTO todo_lists (name, owner_id)
+                VALUES ('Collaborative', ?)
+            """, (user_id,))
+            collaborative_list_id = cursor.lastrowid
+        else:
+            collaborative_list_id = collaborative_list["id"]
+
+        conn.execute("""
+            INSERT OR IGNORE INTO todo_list_members
+                (list_id, user_id, role)
+            VALUES (?, ?, 'owner')
+        """, (collaborative_list_id, user_id))
+
 
     conn.commit()
     conn.close()
@@ -78,32 +159,33 @@ def login_required():
 
 
 def redirect_to_tasks():
-    sort = request.form.get("sort", "")
-    priority = request.form.get(
-        "priority_filter", request.form.get("priority", "")
-    )
-    category = request.form.get(
-        "category_filter", request.form.get("category", "")
-    )
-
     filters = {
         key: value
         for key, value in {
-            "sort": sort,
-            "priority": priority,
-            "category": category
+            "sort": request.form.get("sort", request.args.get("sort", "")),
+            "priority": request.form.get(
+                "priority_filter",
+                request.form.get(
+                    "priority", request.args.get("priority", "")
+                )
+            ),
+            "category": request.form.get(
+                "category_filter",
+                request.form.get(
+                    "category", request.args.get("category", "")
+                )
+            ),
+            "list_id": request.form.get(
+                "list_id",
+                request.args.get(
+                    "list_id", session.get("selected_list_id", "")
+                )
+            )
         }.items()
         if value
     }
 
     return redirect("/?" + urlencode(filters) if filters else "/")
-
-
-def get_user_todo(conn, todo_id):
-    return conn.execute(
-        "SELECT * FROM todos WHERE id = ? AND user_id = ?",
-        (todo_id, session["user_id"])
-    ).fetchone()
 
 
 def format_todo_dates(todos):
@@ -127,6 +209,93 @@ def format_todo_dates(todos):
     return todos
 
 
+def get_accessible_lists(conn, user_id):
+    lists = conn.execute("""
+        SELECT DISTINCT
+            todo_lists.id,
+            todo_lists.name,
+            todo_lists.owner_id,
+            users.display_name AS owner_name
+        FROM todo_lists
+        JOIN users ON todo_lists.owner_id = users.id
+        LEFT JOIN todo_list_members
+            ON todo_lists.id = todo_list_members.list_id
+        WHERE todo_lists.owner_id = ?
+           OR todo_list_members.user_id = ?
+        ORDER BY
+            CASE
+                WHEN todo_lists.owner_id = ?
+                     AND todo_lists.name = 'Personal'
+                THEN 0
+                WHEN todo_lists.owner_id = ?
+                     AND todo_lists.name = 'Collaborative'
+                THEN 1
+                ELSE 2
+            END,
+            users.display_name
+    """, (user_id, user_id, user_id, user_id)).fetchall()
+
+    return lists
+
+
+def get_selected_list(conn):
+    user_id = session["user_id"]
+    available_lists = get_accessible_lists(conn, user_id)
+
+    requested_id = request.args.get("list_id", type=int)
+
+    if requested_id is not None:
+        for todo_list in available_lists:
+            if todo_list["id"] == requested_id:
+                session["selected_list_id"] = requested_id
+                return todo_list
+
+        # The requested list does not belong to or isn't shared with this user.
+        session.pop("selected_list_id", None)
+
+    # Reuse the last selected list if the user can still access it.
+    saved_id = session.get("selected_list_id")
+
+    for todo_list in available_lists:
+        if todo_list["id"] == saved_id:
+            return todo_list
+
+    # Default to the first accessible list.
+    if available_lists:
+        session["selected_list_id"] = available_lists[0]["id"]
+        return available_lists[0]
+
+    return None
+
+
+def user_can_access_list(conn, list_id, user_id):
+    return conn.execute("""
+        SELECT l.id
+        FROM todo_lists AS l
+        LEFT JOIN todo_list_members AS m
+            ON m.list_id = l.id AND m.user_id = ?
+        WHERE l.id = ?
+          AND (l.owner_id = ? OR m.user_id IS NOT NULL)
+    """, (user_id, list_id, user_id)).fetchone() is not None
+
+
+def get_user_todo(conn, todo_id):
+    return conn.execute("""
+        SELECT t.*
+        FROM todos AS t
+        JOIN todo_lists AS l ON l.id = t.list_id
+        LEFT JOIN todo_list_members AS m
+            ON m.list_id = l.id AND m.user_id = ?
+        WHERE t.id = ?
+          AND (l.owner_id = ? OR m.user_id IS NOT NULL)
+    """, (
+        session["user_id"],
+        todo_id,
+        session["user_id"]
+    )).fetchone()
+
+
+
 # ==================== DISPLAY TASKS ====================
 
 @app.route("/")
@@ -145,8 +314,32 @@ def index():
         "category": "category DESC"
     }
 
-    conditions = ["user_id = ?"]
-    params = [session["user_id"]]
+    conn = get_db()
+
+    available_lists = get_accessible_lists(conn, session["user_id"])
+    requested_id = request.args.get("list_id", type=int)
+
+    if requested_id is not None and not any(
+        todo_list["id"] == requested_id for todo_list in available_lists
+    ):
+        previous_id = session.get("selected_list_id")
+
+        if previous_id is not None and any(
+            todo_list["id"] == previous_id for todo_list in available_lists
+        ):
+            flash("You can't access that list.")
+            conn.close()
+            return redirect(f"/?list_id={previous_id}")
+
+    selected_list = get_selected_list(conn)
+
+    if selected_list is None:
+        conn.close()
+        flash("No accessible to-do lists were found.")
+        return redirect("/profile")
+
+    conditions = ["list_id = ?"]
+    params = [selected_list["id"]]
 
     if priority in ("LOW", "MED", "HIGH"):
         conditions.append("priority = ?")
@@ -162,22 +355,49 @@ def index():
     if sort_column:
         query += " ORDER BY " + sort_column
 
-    conn = get_db()
     todos = conn.execute(query, params).fetchall()
+
+    # Get the members of the selected Collaborative list.
+    if selected_list["name"] == "Collaborative":
+        group_members = conn.execute("""
+            SELECT users.display_name, todo_list_members.role
+            FROM todo_list_members
+            JOIN users ON todo_list_members.user_id = users.id
+            WHERE todo_list_members.list_id = ?
+            ORDER BY
+                CASE
+                    WHEN todo_list_members.role = 'owner' THEN 0
+                    ELSE 1
+                END,
+                users.display_name
+        """, (selected_list["id"],)).fetchall()
+    else:
+        group_members = []
+
     conn.close()
 
     todos = format_todo_dates([dict(todo) for todo in todos])
+    selected_list_owner_name = selected_list["owner_name"]
+
 
     return render_template(
         "index.html",
         todos=todos,
         sort=sort,
         priority=priority,
-        category=category
+        category=category,
+        available_lists=available_lists,
+        selected_list_id=selected_list["id"],
+        selected_list_name=selected_list["name"],
+        selected_list_owner_name=selected_list_owner_name,
+        is_list_owner=(selected_list["owner_id"] == session["user_id"]),
+        group_members=group_members
     )
 
 
+
 # ==================== ADD TASK ====================
+
 
 @app.route("/add", methods=["POST"])
 def add():
@@ -202,13 +422,26 @@ def add():
         return redirect_to_tasks()
 
     conn = get_db()
-    conn.execute(
-        """
-        INSERT INTO todos (title, due_date, priority, category, user_id)
-        VALUES (?, ?, ?, ?, ?)
-        """,
-        (title, due_date, priority, category, session["user_id"])
-    )
+    selected_list = get_selected_list(conn)
+
+    if selected_list is None:
+        conn.close()
+        flash("No accessible to-do list was found.")
+        return redirect("/")
+
+    conn.execute("""
+        INSERT INTO todos
+            (title, due_date, priority, category, user_id, list_id)
+        VALUES (?, ?, ?, ?, ?, ?)
+    """, (
+        title,
+        due_date,
+        priority,
+        category,
+        session["user_id"],
+        selected_list["id"]
+    ))
+
     conn.commit()
     conn.close()
 
@@ -240,10 +473,13 @@ def delete(id):
     session["undo_category"] = request.form.get(
         "category_filter", request.form.get("category", "")
     )
+    session["undo_list_id"] = request.form.get(
+    "list_id", session.get("selected_list_id", "")
+    )
 
     conn.execute(
-        "DELETE FROM todos WHERE id = ? AND user_id = ?",
-        (id, session["user_id"])
+        "DELETE FROM todos WHERE id = ?",
+        (id,)   
     )
     conn.commit()
     conn.close()
@@ -260,24 +496,28 @@ def undo():
 
     todo = session.get("deleted_todo")
 
-    if todo and todo.get("user_id") == session["user_id"]:
+    if todo:
         conn = get_db()
+        list_id = todo.get("list_id")
 
-        # Restore only if the original ID is still available.
-        existing = conn.execute(
-            "SELECT id FROM todos WHERE id = ?",
-            (todo["id"],)
-        ).fetchone()
+        # Restore only if the user still has access to the original list.
+        if (
+            list_id is not None
+            and user_can_access_list(conn, list_id, session["user_id"])
+        ):
+            existing = conn.execute(
+                "SELECT id FROM todos WHERE id = ?",
+                (todo["id"],)
+            ).fetchone()
 
-        if not existing:
-            conn.execute(
-                """
-                INSERT INTO todos
-                (id, title, completed, due_date, priority,
-                 category, created_at, user_id)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
+            if not existing:
+                conn.execute("""
+                    INSERT INTO todos (
+                        id, title, completed, due_date, priority,
+                        category, created_at, user_id, list_id
+                    )
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
                     todo["id"],
                     todo["title"],
                     todo["completed"],
@@ -285,29 +525,40 @@ def undo():
                     todo["priority"],
                     todo["category"],
                     todo["created_at"],
-                    session["user_id"]
-                )
-            )
-            conn.commit()
-            flash("Task restored successfully!")
+                    todo["user_id"],
+                    list_id
+                ))
+
+                conn.commit()
+                flash("Task restored successfully!")
+            else:
+                flash("Unable to restore the task because its ID is in use.")
         else:
-            flash("Unable to restore the task because its ID is in use.")
+            flash("You no longer have access to the original list.")
 
         conn.close()
 
     session.pop("deleted_todo", None)
-    session.pop("undo_sort", None)
-    session.pop("undo_priority", None)
-    session.pop("undo_category", None)
 
-    # Restore the previous filters after undo.
-    return redirect("/?" + urlencode({
-        key: value for key, value in {
+    filters = {
+        key: value
+        for key, value in {
             "sort": session.pop("undo_sort", ""),
             "priority": session.pop("undo_priority", ""),
-            "category": session.pop("undo_category", "")
-        }.items() if value
-    }))
+            "category": session.pop("undo_category", ""),
+            "list_id": session.pop(
+                "undo_list_id",
+                session.get("selected_list_id", "")
+            )
+        }.items()
+        if value
+    }
+
+    selected_list_id = filters.get("list_id")
+    if selected_list_id:
+        session["selected_list_id"] = int(selected_list_id)
+
+    return redirect("/?" + urlencode(filters) if filters else "/")
 
 
 # ==================== CLEAR UNDO ====================
@@ -318,6 +569,7 @@ def clear_undo():
     session.pop("undo_sort", None)
     session.pop("undo_priority", None)
     session.pop("undo_category", None)
+    session.pop("undo_list_id", None)
     return ""
 
 
@@ -353,17 +605,11 @@ def update(id):
         flash("Task not found.")
         return redirect_to_tasks()
 
-    conn.execute(
-        """
+    conn.execute("""
         UPDATE todos
         SET title = ?, due_date = ?, priority = ?, category = ?
-        WHERE id = ? AND user_id = ?
-        """,
-        (
-            title, due_date, priority, category,
-            id, session["user_id"]
-        )
-    )
+        WHERE id = ?
+    """, (title, due_date, priority, category, id))
 
     conn.commit()
     conn.close()
@@ -380,22 +626,89 @@ def updateCheckmark(id):
         return redirect("/login")
 
     status = request.form.get("status", "0")
+
     if status not in ("0", "1"):
         flash("Invalid task status.")
         return redirect_to_tasks()
 
     conn = get_db()
+    todo = get_user_todo(conn, id)
+
+    if todo is None:
+        conn.close()
+        flash("Task not found.")
+        return redirect_to_tasks()
+
     conn.execute(
-        """
-        UPDATE todos SET completed = ?
-        WHERE id = ? AND user_id = ?
-        """,
-        (int(status), id, session["user_id"])
+        "UPDATE todos SET completed = ? WHERE id = ?",
+        (int(status), id)
     )
+
     conn.commit()
     conn.close()
 
     return redirect_to_tasks()
+
+
+# ==================== INVITE COLLABORATOR ====================
+
+@app.route("/collaborative/invite", methods=["POST"])
+def invite_collaborator():
+    if not login_required():
+        return redirect("/login")
+
+    email = request.form.get("email", "").strip().lower()
+
+    if not email:
+        flash("Please enter the email address of the user to invite.")
+        return redirect("/")
+
+    conn = get_db()
+
+    # Find the current user's Collaborative list.
+    collaborative_list = conn.execute("""
+        SELECT id FROM todo_lists
+        WHERE owner_id = ? AND name = 'Collaborative'
+    """, (session["user_id"],)).fetchone()
+
+    if collaborative_list is None:
+        conn.close()
+        flash("Your Collaborative list could not be found.")
+        return redirect("/")
+
+    # Find the invited account.
+    invited_user = conn.execute("""
+        SELECT id FROM users
+        WHERE LOWER(email) = ?
+    """, (email,)).fetchone()
+
+    if invited_user is None:
+        conn.close()
+        flash("No account was found with that email address.")
+        return redirect("/")
+
+    if invited_user["id"] == session["user_id"]:
+        conn.close()
+        flash("You cannot invite yourself.")
+        return redirect("/")
+
+    # Add access only to this Collaborative list.
+    cursor = conn.execute("""
+        INSERT OR IGNORE INTO todo_list_members
+            (list_id, user_id, role)
+        VALUES (?, ?, 'member')
+    """, (collaborative_list["id"], invited_user["id"]))
+
+    conn.commit()
+    already_member = cursor.rowcount == 0
+    conn.close()
+
+    if already_member:
+        flash("That user already has access to your Collaborative list.")
+    else:
+        flash("User added to your Collaborative list successfully!")
+
+    return redirect("/")
 
 
 # ==================== EMAIL ====================
@@ -437,7 +750,7 @@ def login():
         return redirect("/profile")
 
     if request.method == "POST":
-        email = request.form["email"].strip()
+        email = request.form["email"].strip().lower()
         password = request.form["password"]
 
         conn = get_db()
@@ -468,7 +781,7 @@ def register():
         return redirect("/profile")
 
     if request.method == "POST":
-        email = request.form["email"].strip()
+        email = request.form["email"].strip().lower()
         display_name = request.form["display_name"].strip()
         password = request.form["password"]
         confirm_password = request.form["confirm_password"]
@@ -490,15 +803,58 @@ def register():
         conn = get_db()
 
         try:
-            conn.execute(
+            cursor = conn.execute(
                 """
                 INSERT INTO users (email, display_name, password)
                 VALUES (?, ?, ?)
                 """,
                 (email, display_name, password_hash)
             )
+
+            user_id = cursor.lastrowid
+
+            # Create the Personal list.
+            cursor = conn.execute(
+                """
+                INSERT INTO todo_lists (name, owner_id)
+                VALUES ('Personal', ?)
+                """,
+                (user_id,)
+            )
+            personal_list_id = cursor.lastrowid
+
+            # Give the user access to their Personal list.
+            conn.execute(
+                """
+                INSERT INTO todo_list_members (list_id, user_id, role)
+                VALUES (?, ?, 'owner')
+                """,
+                (personal_list_id, user_id)
+            )
+
+            # Create the Collaborative list.
+            cursor = conn.execute(
+                """
+                INSERT INTO todo_lists (name, owner_id)
+                VALUES ('Collaborative', ?)
+                """,
+                (user_id,)
+            )
+            collaborative_list_id = cursor.lastrowid
+
+            # Give the user access to their Collaborative list.
+            conn.execute(
+                """
+                INSERT INTO todo_list_members (list_id, user_id, role)
+                VALUES (?, ?, 'owner')
+                """,
+                (collaborative_list_id, user_id)
+            )
+
             conn.commit()
+
         except sqlite3.IntegrityError:
+            conn.rollback()
             conn.close()
             flash("Email already exists!")
             return redirect("/register")
@@ -527,7 +883,7 @@ def forgot_password():
         return redirect("/profile")
 
     if request.method == "POST":
-        email = request.form["email"].strip()
+        email = request.form["email"].strip().lower()
 
         conn = get_db()
         user = conn.execute(
@@ -708,7 +1064,7 @@ def profile():
         existing_user = conn.execute(
             """
             SELECT id FROM users
-            WHERE email = ? AND id != ?
+            WHERE LOWER(email) = ? AND id != ?
             """,
             (email, session["user_id"])
         ).fetchone()
