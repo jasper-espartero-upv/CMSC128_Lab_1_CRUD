@@ -200,5 +200,3 @@ Visit:
 ```text
 http://127.0.0.1:5000
 ```
-
-Register an account to start using the application. Each new account receives a Personal list and a Collaborative list.
