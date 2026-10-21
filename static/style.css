@@ -5,7 +5,7 @@
 }
 
 body {
-    margin: 30px;
+    margin: 50px;
     font-family: Arial, Helvetica, sans-serif;
     background-color: #f4f5f7;
     color: #202124;
@@ -955,4 +955,28 @@ main .logout-form button:hover {
 .back-button:hover {
     background-color: #f0f0f0;
     text-decoration: none;
+}
+
+/* Hover tooltip */
+.back-button::after {
+    content: "Back to To-Do List";
+    position: absolute;
+    top: 50%;
+    right: calc(100% + 8px);
+    transform: translateY(-50%);
+    background-color: #333;
+    color: white;
+    padding: 7px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.back-button:hover::after {
+    opacity: 1;
+    visibility: visible;
 }
