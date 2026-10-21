@@ -64,17 +64,6 @@ def init_db():
         )
     """)
 
-    # Migrate an existing todo.db created before accounts were added.
-    columns = {
-        row["name"]
-        for row in conn.execute("PRAGMA table_info(todos)").fetchall()
-    }
-
-    if "user_id" not in columns:
-        conn.execute(
-            "ALTER TABLE todos ADD COLUMN user_id INTEGER REFERENCES users(id)"
-        )
-
     conn.commit()
     conn.close()
 
