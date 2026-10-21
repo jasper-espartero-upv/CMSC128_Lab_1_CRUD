@@ -259,7 +259,6 @@ def delete(id):
     conn.commit()
     conn.close()
 
-    flash("Task deleted. You can undo this action.")
     return redirect_to_tasks()
 
 
