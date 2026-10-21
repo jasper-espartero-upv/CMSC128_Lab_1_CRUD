@@ -1,118 +1,62 @@
-// ==================== UNDO POPUP ====================
-
-const undoPopup = document.getElementById("undo-popup");
-
-if (undoPopup) {
-    setTimeout(() => {
-        undoPopup.remove();
-
-        fetch("/clear-undo", {
-            method: "POST"
-        });
-    }, 5000);
-}
-
-
-// ==================== FLASH POPUP ====================
-
-const flashPopup = document.querySelector(".flash-popup");
-
-if (flashPopup) {
-    setTimeout(() => {
-        flashPopup.remove();
-    }, 3000);
-}
-
-
-// ==================== TASK MENU ====================
-
-const menuButtons = document.querySelectorAll(".menu-button");
-
-menuButtons.forEach(button => {
-    button.addEventListener("click", (event) => {
-        event.stopPropagation();
-
-        const menu = button.parentElement;
-
-        document.querySelectorAll(".task-menu").forEach(otherMenu => {
-            if (otherMenu !== menu) {
-                otherMenu.classList.remove("active");
-            }
-        });
-
-        menu.classList.toggle("active");
-    });
-});
-
-document.addEventListener("click", () => {
-    document.querySelectorAll(".task-menu").forEach(menu => {
-        menu.classList.remove("active");
-    });
-});
-
-
-// ==================== ADD MODAL ====================
-
-const addCard = document.getElementById("add-card");
-const addModal = document.getElementById("add-modal");
-const closeModal = document.getElementById("close-modal");
-
-addCard.addEventListener("click", () => {
-    addModal.style.display = "flex";
-});
-
-closeModal.addEventListener("click", () => {
-    addModal.style.display = "none";
-});
-
-addModal.addEventListener("click", (event) => {
-    if (event.target === addModal) {
-        addModal.style.display = "none";
+window.addEventListener("pageshow", function (event) {
+    if (event.persisted) {
+        window.location.reload();
     }
 });
 
 
-// ==================== EDIT MODAL ====================
+function openLogoutPopup() {
+    document.getElementById("logout-popup").classList.add("show");
+}
 
-const editButtons = document.querySelectorAll(".edit-button");
 
-const editModal = document.getElementById("edit-modal");
-const closeEditModal = document.getElementById("close-edit-modal");
+function closeLogoutPopup() {
+    document.getElementById("logout-popup").classList.remove("show");
+}
 
-const editForm = document.getElementById("edit-form");
 
-const editTitle = document.getElementById("edit-title");
-const editDueDate = document.getElementById("edit-due-date");
-const editPriority = document.getElementById("edit-priority");
-const editCategory = document.getElementById("edit-category");
+let formChanged = false;
 
-editButtons.forEach(button => {
+const profileForm = document.querySelector("#profile-form");
 
-    button.addEventListener("click", () => {
+if (profileForm) {
+    const saveButton = document.querySelector("#save-button");
 
-        const id = button.dataset.id;
+    const initialDisplayName = document.querySelector("#display_name").value;
+    const initialEmail = document.querySelector("#email").value;
 
-        editTitle.value = button.dataset.title;
-        editDueDate.value = button.dataset.dueDate;
-        editPriority.value = button.dataset.priority;
-        editCategory.value = button.dataset.category;
+    function checkFormChanges() {
+        const displayName = document.querySelector("#display_name").value;
+        const email = document.querySelector("#email").value;
 
-        editForm.action = `/update/${id}`;
+        const currentPassword = document.querySelector("#current_password").value;
+        const newPassword = document.querySelector("#new_password").value;
+        const confirmPassword = document.querySelector("#confirm_password").value;
 
-        editModal.style.display = "flex";
+        const hasChanges =
+            displayName !== initialDisplayName ||
+            email !== initialEmail ||
+            currentPassword !== "" ||
+            newPassword !== "" ||
+            confirmPassword !== "";
 
-    });
-
-});
-
-closeEditModal.addEventListener("click", () => {
-    editModal.style.display = "none";
-});
-
-editModal.addEventListener("click", (event) => {
-
-    if (event.target === editModal) {
-        editModal.style.display = "none";
+        saveButton.disabled = !hasChanges;
+        formChanged = hasChanges;
     }
 
+    profileForm.addEventListener("input", checkFormChanges);
+
+    profileForm.addEventListener("submit", function () {
+        formChanged = false;
+    });
+
+    checkFormChanges();
+}
+
+
+window.addEventListener("beforeunload", function (event) {
+    if (formChanged) {
+        event.preventDefault();
+        event.returnValue = "";
+    }
 });
