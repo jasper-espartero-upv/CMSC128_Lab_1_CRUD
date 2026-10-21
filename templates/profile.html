@@ -10,7 +10,15 @@
 
     <main>
 
-        <h1>Profile</h1>
+        <div class="profile-page-header">
+            <a href="/" class="back-button" title="Back to To-Do List"
+                aria-label="Back to To-Do List">
+                <img src="{{ url_for('static', filename='images/back_icon.png') }}"
+                alt="Back">
+            </a>
+
+            <h1>Profile</h1>
+        </div>
 
         {% with messages = get_flashed_messages() %}
             {% for message in messages %}
