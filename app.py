@@ -15,12 +15,13 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY")
+DATABASE = os.getenv("DATABASE_PATH", "todo.db")
 
 
 # ==================== DATABASE ====================
 
 def get_db():
-    conn = sqlite3.connect("todo.db")
+    conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
     return conn
