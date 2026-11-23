@@ -180,11 +180,11 @@
 
         <!-- My Profile -->
         <div class="header-actions">
-            <a href="/profile" class="profile-button">
+            <a href="/profile" class="profile-button" title="View Account Information">
                 <img src="{{ url_for('static', filename='images/profile_icon.png') }}"
                     alt=""
                     class="profile-icon">
-                <span>My Profile</span>
+                <span>{{ user_display_name }}</span>
             </a>
         </div>
 

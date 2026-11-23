@@ -318,6 +318,13 @@ def index():
 
     conn = get_db()
 
+    user = conn.execute(
+        "SELECT display_name FROM users WHERE id = ?",
+        (session["user_id"],)
+    ).fetchone()
+
+    user_display_name = user["display_name"]
+
     available_lists = get_accessible_lists(conn, session["user_id"])
     requested_id = request.args.get("list_id", type=int)
 
@@ -393,7 +400,8 @@ def index():
         selected_list_name=selected_list["name"],
         selected_list_owner_name=selected_list_owner_name,
         is_list_owner=(selected_list["owner_id"] == session["user_id"]),
-        group_members=group_members
+        group_members=group_members,
+        user_display_name=user_display_name
     )
 
 
