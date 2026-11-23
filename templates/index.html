@@ -147,7 +147,8 @@
                 <button type="button"
                         id="list-dropdown-button"
                         class="list-dropdown-button">
-                    ▼
+                    <img src="{{ url_for('static', filename='images/dropdown_icon.png') }}"
+                        alt="">
                 </button>
 
                 <div class="list-dropdown-menu" id="list-dropdown-menu">
@@ -271,94 +272,98 @@
 
     <!-- ==================== SORT AND FILTER ==================== -->
 
-    <form action="/" method="GET">
+    <form action="/" method="GET" class="filter-bar">
+        <div class="filter-group">
+            <!-- Sort tasks -->
+            <label for="sort">Sort by:</label>
+            <div class="filter-select">
+                <select name="sort" id="sort" onchange="this.form.submit()">
 
-        <!-- Sort tasks -->
-        <label for="sort">Sort by:</label>
+                    <option value="created_at"
+                        {% if sort == "created_at" %} selected {% endif %}>
+                        Date Added
+                    </option>
 
-        <select name="sort" id="sort">
+                    <option value="due_date"
+                        {% if sort == "due_date" %} selected {% endif %}>
+                        Due Date
+                    </option>
 
-            <option value="created_at"
-                {% if sort == "created_at" %} selected {% endif %}>
-                Date Added
-            </option>
+                    <option value="priority"
+                        {% if sort == "priority" %} selected {% endif %}>
+                        Priority
+                    </option>
 
-            <option value="due_date"
-                {% if sort == "due_date" %} selected {% endif %}>
-                Due Date
-            </option>
+                    <option value="category"
+                        {% if sort == "category" %} selected {% endif %}>
+                        Category
+                    </option>
 
-            <option value="priority"
-                {% if sort == "priority" %} selected {% endif %}>
-                Priority
-            </option>
+                </select>
+            </div>
+        </div>
 
-            <option value="category"
-                {% if sort == "category" %} selected {% endif %}>
-                Category
-            </option>
+        <div class="filter-group">
+            <!-- Filter tasks by priority -->
+            <label for="priority">Filter by Priority:</label>
+            <div class="filter-select">
+                <select name="priority" id="priority" onchange="this.form.submit()">
 
-        </select>
+                    <option value=""
+                        {% if priority == "" %} selected {% endif %}>
+                        All Priorities
+                    </option>
 
+                    <option value="LOW"
+                        {% if priority == "LOW" %} selected {% endif %}>
+                        Low
+                    </option>
 
-        <!-- Filter tasks by priority -->
-        <label for="priority">Filter by Priority:</label>
+                    <option value="MED"
+                        {% if priority == "MED" %} selected {% endif %}>
+                        Medium
+                    </option>
 
-        <select name="priority" id="priority">
+                    <option value="HIGH"
+                        {% if priority == "HIGH" %} selected {% endif %}>
+                        High
+                    </option>
 
-            <option value=""
-                {% if priority == "" %} selected {% endif %}>
-                All Priorities
-            </option>
-
-            <option value="LOW"
-                {% if priority == "LOW" %} selected {% endif %}>
-                Low
-            </option>
-
-            <option value="MED"
-                {% if priority == "MED" %} selected {% endif %}>
-                Medium
-            </option>
-
-            <option value="HIGH"
-                {% if priority == "HIGH" %} selected {% endif %}>
-                High
-            </option>
-
-        </select>
-
-
-        <!-- Filter tasks by category -->
-        <label for="category">Filter by Category:</label>
-
-        <select name="category" id="category">
-
-            <option value=""
-                {% if category == "" %} selected {% endif %}>
-                All Categories
-            </option>
-
-            <option value="School"
-                {% if category == "School" %} selected {% endif %}>
-                School
-            </option>
-
-            <option value="Personal"
-                {% if category == "Personal" %} selected {% endif %}>
-                Personal
-            </option>
-
-            <option value="Others"
-                {% if category == "Others" %} selected {% endif %}>
-                Others
-            </option>
-
-        </select>
+                </select>
+            </div>
+        </div>
 
 
-        <!-- Apply selected sort and filters -->
-        <button type="submit">Apply</button>
+        <div class="filter-group">
+            <!-- Filter tasks by category -->
+            <label for="category">Filter by Category:</label>
+
+            <div class="filter-select">
+                <select name="category" id="category" onchange="this.form.submit()">
+
+                    <option value=""
+                        {% if category == "" %} selected {% endif %}>
+                        All Categories
+                    </option>
+
+                    <option value="School"
+                        {% if category == "School" %} selected {% endif %}>
+                        School
+                    </option>
+
+                    <option value="Personal"
+                        {% if category == "Personal" %} selected {% endif %}>
+                        Personal
+                    </option>
+
+                    <option value="Others"
+                        {% if category == "Others" %} selected {% endif %}>
+                        Others
+                    </option>
+
+                </select>
+            </div>
+        </div>
 
     </form>
 
