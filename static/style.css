@@ -1049,3 +1049,38 @@ main .logout-form button:hover {
 .filter-bar button:hover {
     background-color: #3c4043;
 }
+
+/* ==================== PASSWORD EYE ==================== */
+
+.password-input {
+    position: relative;
+}
+
+.password-input input {
+    width: 100%;
+    padding-right: 40px;
+}
+
+.password-input button {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 32px;
+    height: 32px;
+
+    border: none;
+    background: none;
+    padding: 6px;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-input button img {
+    width: 20px;
+    height: 20px;
+}

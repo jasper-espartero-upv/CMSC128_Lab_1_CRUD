@@ -51,27 +51,69 @@
             <h2>Change Password</h2>
 
             <label for="current_password">Current Password</label>
-            <input
-                type="password"
-                id="current_password"
-                name="current_password"
-            >
+
+            <div class="password-input">
+                <input
+                    type="password"
+                    id="current_password"
+                    name="current_password"
+                >
+
+                <button
+                    type="button"
+                    class="toggle-password"
+                    data-target="current_password"
+                >
+                    <img
+                        src="{{ url_for('static', filename='images/eye_icon.png') }}"
+                        alt=""
+                    >
+                </button>
+            </div>
 
             <label for="new_password">New Password</label>
-            <input
-                type="password"
-                id="new_password"
-                name="new_password"
-                minlength="8"
-            >
+
+            <div class="password-input">
+                <input
+                    type="password"
+                    id="new_password"
+                    name="new_password"
+                    minlength="8"
+                >
+
+                <button
+                    type="button"
+                    class="toggle-password"
+                    data-target="new_password"
+                >
+                    <img
+                        src="{{ url_for('static', filename='images/eye_icon.png') }}"
+                        alt=""
+                    >
+                </button>
+            </div>
 
             <label for="confirm_password">Confirm New Password</label>
-            <input
-                type="password"
-                id="confirm_password"
-                name="confirm_password"
-                minlength="8"
-            >
+
+            <div class="password-input">
+                <input
+                    type="password"
+                    id="confirm_password"
+                    name="confirm_password"
+                    minlength="8"
+                >
+
+                <button
+                    type="button"
+                    class="toggle-password"
+                    data-target="confirm_password"
+                >
+                    <img
+                        src="{{ url_for('static', filename='images/eye_icon.png') }}"
+                        alt=""
+                    >
+                </button>
+            </div>
 
             <button type="submit" id="save-button" disabled>
                 Save Changes
@@ -112,7 +154,6 @@
             </div>
 
         </div>
-
 
     </main>
 

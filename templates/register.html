@@ -37,13 +37,27 @@
             >
 
             <label for="password">Password</label>
-            <input
-                type="password"
-                id="password"
-                name="password"
-                minlength="8"
-                required
-            >
+
+            <div class="password-input">
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    minlength="8"
+                    required
+                >
+
+                <button
+                    type="button"
+                    class="toggle-password"
+                    data-target="password"
+                >
+                    <img
+                        src="{{ url_for('static', filename='images/eye_icon.png') }}"
+                        alt=""
+                    >
+                </button>
+            </div>
 
             <div class="password-requirements">
                 <p id="password-status">Password requirements:</p>
@@ -75,13 +89,27 @@
             </div>
 
             <label for="confirm_password">Confirm Password</label>
-            <input
-                type="password"
-                id="confirm_password"
-                name="confirm_password"
-                minlength="8"
-                required
-            >
+
+            <div class="password-input">
+                <input
+                    type="password"
+                    id="confirm_password"
+                    name="confirm_password"
+                    minlength="8"
+                    required
+                >
+
+                <button
+                    type="button"
+                    class="toggle-password"
+                    data-target="confirm_password"
+                >
+                    <img
+                        src="{{ url_for('static', filename='images/eye_icon.png') }}"
+                        alt=""
+                    >
+                </button>
+            </div>
 
             <button type="submit">
                 Register
@@ -101,8 +129,9 @@
         </div>
 
     </main>
-    
+
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+
 </body>
 
 </html>

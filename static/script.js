@@ -337,3 +337,19 @@ function updatePasswordCheck(id, valid) {
         light.classList.remove("valid");
     }
 }
+
+
+document.querySelectorAll(".toggle-password").forEach(function (button) {
+    button.addEventListener("click", function () {
+        const password = document.getElementById(button.dataset.target);
+        const icon = button.querySelector("img");
+
+        if (password.type === "password") {
+            password.type = "text";
+            icon.src = "/static/images/eye_off_icon.png";
+        } else {
+            password.type = "password";
+            icon.src = "/static/images/eye_icon.png";
+        }
+    });
+});
