@@ -276,3 +276,64 @@ if (openCollaboratorModal && closeCollaboratorModal && collaboratorModal) {
         }
     });
 }
+
+const passwordInput = document.getElementById("password");
+
+if (passwordInput) {
+    passwordInput.addEventListener("input", function () {
+        const password = passwordInput.value;
+
+        updatePasswordCheck(
+            "length-check",
+            password.length >= 8
+        );
+
+        updatePasswordCheck(
+            "uppercase-check",
+            /[A-Z]/.test(password)
+        );
+
+        updatePasswordCheck(
+            "lowercase-check",
+            /[a-z]/.test(password)
+        );
+
+        updatePasswordCheck(
+            "number-check",
+            /[0-9]/.test(password)
+        );
+
+        updatePasswordCheck(
+            "special-check",
+            /[^A-Za-z0-9]/.test(password)
+        );
+
+        const allValid =
+            password.length >= 8 &&
+            /[A-Z]/.test(password) &&
+            /[a-z]/.test(password) &&
+            /[0-9]/.test(password) &&
+            /[^A-Za-z0-9]/.test(password);
+
+        const status = document.getElementById("password-status");
+
+        if (allValid) {
+            status.textContent = "Password meets all requirements";
+            status.classList.add("password-valid");
+        } else {
+            status.textContent = "Password requirements:";
+            status.classList.remove("password-valid");
+        }
+    });
+}
+
+function updatePasswordCheck(id, valid) {
+    const check = document.getElementById(id);
+    const light = check.querySelector(".check-light");
+
+    if (valid) {
+        light.classList.add("valid");
+    } else {
+        light.classList.remove("valid");
+    }
+}

@@ -11,7 +11,7 @@ body {
     color: #202124;
 }
 
-/* ==================== ACCOUNT PAGES ==================== */
+/* ==================== ACCOUNT `GES ==================== */
 
 main {
     width: 100%;
@@ -979,4 +979,40 @@ main .logout-form button:hover {
 .back-button:hover::after {
     opacity: 1;
     visibility: visible;
+}
+
+/* ==================== PASSWORD ==================== */
+
+.password-requirements {
+    margin-top: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.password-requirements p {
+    margin: 0 0 8px;
+    font-weight: 600;
+}
+
+.password-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 5px 0;
+}
+
+.check-light {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background-color: #d9534f;
+    flex-shrink: 0;
+}
+
+.check-light.valid {
+    background-color: #28a745;
+}
+
+.password-valid {
+    color: #28a745;
 }
