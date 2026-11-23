@@ -994,3 +994,26 @@ main .logout-form button:hover {
 .password-valid {
     color: #28a745;
 }
+
+/* ==================== 404 PAGE ==================== */
+
+.error-page {
+    text-align: center;
+}
+
+.error-page .back-button {
+    display: block;
+    width: 180px;
+    margin: 20px auto 0;
+    padding: 10px 15px;
+    background-color: #202124;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.back-button:hover {
+    background-color: #3c4043;
+}
