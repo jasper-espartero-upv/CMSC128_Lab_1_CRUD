@@ -1147,6 +1147,14 @@ main .logout-form button:hover {
     justify-content: center;
 }
 
+.password-input button:hover {
+    background: none;
+}
+
+.password-input button:hover img {
+    filter: none;
+}
+
 .password-input button img {
     width: 20px;
     height: 20px;
