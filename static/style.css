@@ -76,7 +76,7 @@ main input {
 }
 
 main input:focus {
-    border: 2px solid #1a73e8;
+    border: 2px solid #202124;
     padding: 13px 11px;
 }
 
@@ -84,7 +84,7 @@ main button {
     border: none;
     border-radius: 4px;
     padding: 12px 20px;
-    background-color: #1a73e8;
+    background-color: #202124;
     color: #ffffff;
     font-size: 14px;
     font-weight: 500;
@@ -93,7 +93,7 @@ main button {
 }
 
 main button:hover {
-    background-color: #1765c1;
+    background-color: #3c4043;
 }
 
 main button:disabled {
@@ -404,11 +404,25 @@ main .logout-form button:hover {
     width: 100%;
     padding: 8px;
     margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
 }
 
 .modal-content form button {
     padding: 10px;
     cursor: pointer;
+}
+
+.modal-content form button[type="submit"] {
+    background-color: #202124;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+}
+
+.modal-content form button[type="submit"]:hover {
+    background-color: #3c4043;
 }
 
 
@@ -506,29 +520,33 @@ main .logout-form button:hover {
 
 .cancel-button {
     background-color: #ffffff;
-    color: #1a73e8;
-    border: 1px solid #dadce0;
+    color: #202124;
+    border: 1px solid #202124;
 }
 
 .cancel-button:hover {
-    background-color: #f8f9fa;
+    background-color: #f2f2f2;
 }
 
 .confirm-button {
-    background-color: #1a73e8;
+    background-color: #202124;
     color: #ffffff;
+}
+
+.confirm-button:hover {
+    background-color: #3c4043;
 }
 
 .logout-button {
     background-color: #ffffff;
-    color: #1a73e8;
-    border: 1px solid #dadce0;
+    color: #202124;
+    border: 1px solid #202124;
 }
 
 .logout-button:hover {
-    background-color: #d93025;
+    background-color: #3c4043;
     color: #ffffff;
-    border-color: #d93025;
+    border-color: #3c4043;
 }
 
 
