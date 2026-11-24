@@ -277,6 +277,9 @@ if (openCollaboratorModal && closeCollaboratorModal && collaboratorModal) {
     });
 }
 
+
+// ==================== PASSWORD REQUIREMENTS ====================
+
 const passwordInput = document.getElementById("password");
 
 if (passwordInput) {
@@ -338,6 +341,7 @@ function updatePasswordCheck(id, valid) {
     }
 }
 
+// ==================== PASSWORD VISIBILITY ====================
 
 document.querySelectorAll(".toggle-password").forEach(function (button) {
     button.addEventListener("click", function () {

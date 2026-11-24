@@ -1141,6 +1141,9 @@ def profile():
     conn.close()
     return render_template("profile.html", user=user)
 
+
+# ==================== ERROR PAGE ====================
+
 @app.errorhandler(404)
 def page_not_found(error):
     return render_template("404.html"), 404
