@@ -10,6 +10,7 @@ import os
 import secrets
 import hashlib
 import smtplib
+import re
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
@@ -797,8 +798,14 @@ def register():
             flash("Passwords do not match!")
             return redirect("/register")
 
-        if len(password) < 8:
-            flash("Password must be at least 8 characters.")
+        if (
+            len(password) < 8
+            or not re.search(r"[A-Z]", password)
+            or not re.search(r"[a-z]", password)
+            or not re.search(r"[0-9]", password)
+            or not re.search(r"[^A-Za-z0-9]", password)
+        ):
+            flash("Password does not meet all requirements.")
             return redirect("/register")
 
         password_hash = generate_password_hash(password)
@@ -1092,9 +1099,15 @@ def profile():
                 flash("Enter a new password.")
                 return redirect("/profile")
 
-            if len(new_password) < 8:
+            if (
+                len(new_password) < 8
+                or not re.search(r"[A-Z]", new_password)
+                or not re.search(r"[a-z]", new_password)
+                or not re.search(r"[0-9]", new_password)
+                or not re.search(r"[^A-Za-z0-9]", new_password)
+            ):
                 conn.close()
-                flash("New password must be at least 8 characters.")
+                flash("New password does not meet all requirements.")
                 return redirect("/profile")
 
             if new_password != confirm_password:

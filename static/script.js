@@ -285,53 +285,95 @@ const passwordInput =
     document.getElementById("new_password");
 
 if (passwordInput) {
-    passwordInput.addEventListener("input", function () {
-        const password = passwordInput.value;
 
-        updatePasswordCheck(
-            "length-check",
-            password.length >= 8
-        );
+    const isRegisterPassword = passwordInput.id === "password" &&
+        document.getElementById("password-status");
 
-        updatePasswordCheck(
-            "uppercase-check",
-            /[A-Z]/.test(password)
-        );
+    const isProfilePassword = passwordInput.id === "new_password";
 
-        updatePasswordCheck(
-            "lowercase-check",
-            /[a-z]/.test(password)
-        );
-
-        updatePasswordCheck(
-            "number-check",
-            /[0-9]/.test(password)
-        );
-
-        updatePasswordCheck(
-            "special-check",
-            /[^A-Za-z0-9]/.test(password)
-        );
-
-        const allValid =
+    function isPasswordValid(password) {
+        return (
             password.length >= 8 &&
             /[A-Z]/.test(password) &&
             /[a-z]/.test(password) &&
             /[0-9]/.test(password) &&
-            /[^A-Za-z0-9]/.test(password);
+            /[^A-Za-z0-9]/.test(password)
+        );
+    }
 
-        const status = document.getElementById("password-status");
+    // Only show password requirements on Register/Profile.
+    if (isRegisterPassword || isProfilePassword) {
 
-        if (status) {
-            if (allValid) {
-                status.textContent = "Password meets all requirements";
-                status.classList.add("password-valid");
-            } else {
-                status.textContent = "Password requirements:";
-                status.classList.remove("password-valid");
+        passwordInput.addEventListener("input", function () {
+            const password = passwordInput.value;
+
+            updatePasswordCheck(
+                "length-check",
+                password.length >= 8
+            );
+
+            updatePasswordCheck(
+                "uppercase-check",
+                /[A-Z]/.test(password)
+            );
+
+            updatePasswordCheck(
+                "lowercase-check",
+                /[a-z]/.test(password)
+            );
+
+            updatePasswordCheck(
+                "number-check",
+                /[0-9]/.test(password)
+            );
+
+            updatePasswordCheck(
+                "special-check",
+                /[^A-Za-z0-9]/.test(password)
+            );
+
+            const allValid = isPasswordValid(password);
+            const status = document.getElementById("password-status");
+
+            if (status) {
+                if (allValid) {
+                    status.textContent = "Password meets all requirements";
+                    status.classList.add("password-valid");
+                } else {
+                    status.textContent = "Password requirements:";
+                    status.classList.remove("password-valid");
+                }
             }
+        });
+
+        const passwordForm = passwordInput.closest("form");
+
+        if (passwordForm) {
+            passwordForm.addEventListener("submit", function (event) {
+
+                // Profile: changing the password is optional.
+                if (passwordInput.id === "new_password" &&
+                    passwordInput.value === "") {
+                    return;
+                }
+
+                if (!isPasswordValid(passwordInput.value)) {
+                    event.preventDefault();
+
+                    const status =
+                        document.getElementById("password-status");
+
+                    if (status) {
+                        status.textContent =
+                            "Password does not meet all requirements.";
+                        status.classList.remove("password-valid");
+                    }
+
+                    passwordInput.focus();
+                }
+            });
         }
-    });
+    }
 }
 
 function updatePasswordCheck(id, valid) {
