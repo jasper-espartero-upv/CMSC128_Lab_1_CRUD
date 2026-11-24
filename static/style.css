@@ -455,14 +455,15 @@ main .logout-form button:hover {
     background-color: #f2f2f2;
 }
 
-.delete-modal-buttons .confirm-button {
-    background-color: #202124;
-    color: #ffffff;
-    border: 1px solid #202124;
+.delete-confirm-button {
+    background-color: #d93025 !important;
+    color: #ffffff !important;
+    border: 1px solid #d93025 !important;
 }
 
-.delete-modal-buttons .confirm-button:hover {
-    background-color: #3c4043;
+.delete-confirm-button:hover {
+    background-color: #b3261e !important;
+    border-color: #b3261e !important;
 }
 
 
