@@ -310,7 +310,13 @@ def index():
     sort_options = {
         "created_at": "created_at DESC",
         "due_date": "due_date ASC",
-        "priority": "priority DESC",
+        "priority": """
+            CASE priority
+                WHEN 'HIGH' THEN 1
+                WHEN 'MED' THEN 2
+                WHEN 'LOW' THEN 3
+            END
+        """,
         "category": "category DESC"
     }
 
