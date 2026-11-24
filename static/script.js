@@ -357,3 +357,32 @@ document.querySelectorAll(".toggle-password").forEach(function (button) {
         }
     });
 });
+
+// ==================== DELETE MODAL ====================
+
+const deleteModal = document.getElementById("delete-modal");
+const cancelDelete = document.getElementById("cancel-delete");
+const deleteForm = document.getElementById("delete-form");
+const deleteTaskTitle = document.getElementById("delete-task-title");
+
+document.querySelectorAll(".delete-button").forEach(function (button) {
+    button.addEventListener("click", function () {
+        const todoId = button.dataset.id;
+        const todoTitle = button.dataset.title;
+
+        deleteTaskTitle.textContent = todoTitle;
+        deleteForm.action = "/delete/" + todoId;
+
+        deleteModal.style.display = "flex";
+    });
+});
+
+cancelDelete.addEventListener("click", function () {
+    deleteModal.style.display = "none";
+});
+
+deleteModal.addEventListener("click", function (event) {
+    if (event.target === deleteModal) {
+        deleteModal.style.display = "none";
+    }
+});

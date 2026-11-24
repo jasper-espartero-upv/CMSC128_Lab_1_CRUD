@@ -425,6 +425,46 @@ main .logout-form button:hover {
     background-color: #3c4043;
 }
 
+.delete-modal-content {
+    padding-top: 10px;
+}
+
+.delete-modal-content p {
+    margin-bottom: 25px;
+}
+
+.delete-modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.delete-modal-buttons button {
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.delete-modal-buttons .cancel-button {
+    background-color: #ffffff;
+    color: #202124;
+    border: 1px solid #202124;
+}
+
+.delete-modal-buttons .cancel-button:hover {
+    background-color: #f2f2f2;
+}
+
+.delete-modal-buttons .confirm-button {
+    background-color: #202124;
+    color: #ffffff;
+    border: 1px solid #202124;
+}
+
+.delete-modal-buttons .confirm-button:hover {
+    background-color: #3c4043;
+}
+
 
 /* ==================== FLASH POPUP ==================== */
 
@@ -463,11 +503,18 @@ main .logout-form button:hover {
 }
 
 .undo-popup button {
-    border: none;
-    background: none;
-    color: #1a73e8;
+    border: 1px solid #202124;
+    border-radius: 4px;
+    background-color: #ffffff;
+    color: #202124;
+    padding: 6px 12px;
     font-weight: bold;
     cursor: pointer;
+}
+
+.undo-popup button:hover {
+    background-color: #202124;
+    color: #ffffff;
 }
 
 
