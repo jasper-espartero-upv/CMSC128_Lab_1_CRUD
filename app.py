@@ -240,10 +240,7 @@ def get_accessible_lists(conn, user_id):
     return lists
 
 
-def get_selected_list(conn):
-    user_id = session["user_id"]
-    available_lists = get_accessible_lists(conn, user_id)
-
+def get_selected_list(available_lists):
     requested_id = request.args.get("list_id", type=int)
 
     if requested_id is not None:
@@ -318,12 +315,7 @@ def index():
 
     conn = get_db()
 
-    user = conn.execute(
-        "SELECT display_name FROM users WHERE id = ?",
-        (session["user_id"],)
-    ).fetchone()
-
-    user_display_name = user["display_name"]
+    user_display_name = session["display_name"]
 
     available_lists = get_accessible_lists(conn, session["user_id"])
     requested_id = request.args.get("list_id", type=int)
@@ -340,7 +332,7 @@ def index():
             conn.close()
             return redirect(f"/?list_id={previous_id}")
 
-    selected_list = get_selected_list(conn)
+    selected_list = get_selected_list(available_lists)
 
     if selected_list is None:
         conn.close()
@@ -432,7 +424,8 @@ def add():
         return redirect_to_tasks()
 
     conn = get_db()
-    selected_list = get_selected_list(conn)
+    available_lists = get_accessible_lists(conn, session["user_id"])
+    selected_list = get_selected_list(available_lists)
 
     if selected_list is None:
         conn.close()
