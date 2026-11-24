@@ -51,27 +51,98 @@
             <h2>Change Password</h2>
 
             <label for="current_password">Current Password</label>
-            <input
-                type="password"
-                id="current_password"
-                name="current_password"
-            >
+
+            <div class="password-input">
+                <input
+                    type="password"
+                    id="current_password"
+                    name="current_password"
+                >
+
+                <button
+                    type="button"
+                    class="toggle-password"
+                    data-target="current_password"
+                >
+                    <img
+                        src="{{ url_for('static', filename='images/eye_icon.png') }}"
+                        alt=""
+                    >
+                </button>
+            </div>
 
             <label for="new_password">New Password</label>
-            <input
-                type="password"
-                id="new_password"
-                name="new_password"
-                minlength="8"
-            >
+
+            <div class="password-input">
+                <input
+                    type="password"
+                    id="new_password"
+                    name="new_password"
+                    minlength="8"
+                >
+
+                <button
+                    type="button"
+                    class="toggle-password"
+                    data-target="new_password"
+                >
+                    <img
+                        src="{{ url_for('static', filename='images/eye_icon.png') }}"
+                        alt=""
+                    >
+                </button>
+            </div>
+
+            <div class="password-requirements">
+                <p id="password-status">Password requirements:</p>
+
+                <div id="length-check" class="password-check">
+                    <span class="check-light"></span>
+                    <span>At least 8 characters</span>
+                </div>
+
+                <div id="uppercase-check" class="password-check">
+                    <span class="check-light"></span>
+                    <span>Uppercase letter</span>
+                </div>
+
+                <div id="lowercase-check" class="password-check">
+                    <span class="check-light"></span>
+                    <span>Lowercase letter</span>
+                </div>
+
+                <div id="number-check" class="password-check">
+                    <span class="check-light"></span>
+                    <span>Number</span>
+                </div>
+
+                <div id="special-check" class="password-check">
+                    <span class="check-light"></span>
+                    <span>Special character</span>
+                </div>
+            </div>
 
             <label for="confirm_password">Confirm New Password</label>
-            <input
-                type="password"
-                id="confirm_password"
-                name="confirm_password"
-                minlength="8"
-            >
+
+            <div class="password-input">
+                <input
+                    type="password"
+                    id="confirm_password"
+                    name="confirm_password"
+                    minlength="8"
+                >
+
+                <button
+                    type="button"
+                    class="toggle-password"
+                    data-target="confirm_password"
+                >
+                    <img
+                        src="{{ url_for('static', filename='images/eye_icon.png') }}"
+                        alt=""
+                    >
+                </button>
+            </div>
 
             <button type="submit" id="save-button" disabled>
                 Save Changes
@@ -112,7 +183,6 @@
             </div>
 
         </div>
-
 
     </main>
 

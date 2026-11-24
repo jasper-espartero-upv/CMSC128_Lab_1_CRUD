@@ -10,6 +10,7 @@ import os
 import secrets
 import hashlib
 import smtplib
+import re
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
@@ -240,10 +241,7 @@ def get_accessible_lists(conn, user_id):
     return lists
 
 
-def get_selected_list(conn):
-    user_id = session["user_id"]
-    available_lists = get_accessible_lists(conn, user_id)
-
+def get_selected_list(available_lists):
     requested_id = request.args.get("list_id", type=int)
 
     if requested_id is not None:
@@ -312,11 +310,19 @@ def index():
     sort_options = {
         "created_at": "created_at DESC",
         "due_date": "due_date ASC",
-        "priority": "priority DESC",
+        "priority": """
+            CASE priority
+                WHEN 'HIGH' THEN 1
+                WHEN 'MED' THEN 2
+                WHEN 'LOW' THEN 3
+            END
+        """,
         "category": "category DESC"
     }
 
     conn = get_db()
+
+    user_display_name = session["display_name"]
 
     available_lists = get_accessible_lists(conn, session["user_id"])
     requested_id = request.args.get("list_id", type=int)
@@ -333,7 +339,7 @@ def index():
             conn.close()
             return redirect(f"/?list_id={previous_id}")
 
-    selected_list = get_selected_list(conn)
+    selected_list = get_selected_list(available_lists)
 
     if selected_list is None:
         conn.close()
@@ -393,7 +399,8 @@ def index():
         selected_list_name=selected_list["name"],
         selected_list_owner_name=selected_list_owner_name,
         is_list_owner=(selected_list["owner_id"] == session["user_id"]),
-        group_members=group_members
+        group_members=group_members,
+        user_display_name=user_display_name
     )
 
 
@@ -424,7 +431,8 @@ def add():
         return redirect_to_tasks()
 
     conn = get_db()
-    selected_list = get_selected_list(conn)
+    available_lists = get_accessible_lists(conn, session["user_id"])
+    selected_list = get_selected_list(available_lists)
 
     if selected_list is None:
         conn.close()
@@ -796,8 +804,14 @@ def register():
             flash("Passwords do not match!")
             return redirect("/register")
 
-        if len(password) < 8:
-            flash("Password must be at least 8 characters.")
+        if (
+            len(password) < 8
+            or not re.search(r"[A-Z]", password)
+            or not re.search(r"[a-z]", password)
+            or not re.search(r"[0-9]", password)
+            or not re.search(r"[^A-Za-z0-9]", password)
+        ):
+            flash("Password does not meet all requirements.")
             return redirect("/register")
 
         password_hash = generate_password_hash(password)
@@ -1091,9 +1105,15 @@ def profile():
                 flash("Enter a new password.")
                 return redirect("/profile")
 
-            if len(new_password) < 8:
+            if (
+                len(new_password) < 8
+                or not re.search(r"[A-Z]", new_password)
+                or not re.search(r"[a-z]", new_password)
+                or not re.search(r"[0-9]", new_password)
+                or not re.search(r"[^A-Za-z0-9]", new_password)
+            ):
                 conn.close()
-                flash("New password must be at least 8 characters.")
+                flash("New password does not meet all requirements.")
                 return redirect("/profile")
 
             if new_password != confirm_password:
@@ -1132,6 +1152,13 @@ def profile():
 
     conn.close()
     return render_template("profile.html", user=user)
+
+
+# ==================== ERROR PAGE ====================
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template("404.html"), 404
 
 
 # ==================== RUN APPLICATION ====================

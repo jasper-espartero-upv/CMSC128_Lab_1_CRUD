@@ -6,6 +6,7 @@
 
 body {
     margin: 50px;
+    margin-top: 20px;
     font-family: Arial, Helvetica, sans-serif;
     background-color: #f4f5f7;
     color: #202124;
@@ -75,7 +76,7 @@ main input {
 }
 
 main input:focus {
-    border: 2px solid #1a73e8;
+    border: 2px solid #202124;
     padding: 13px 11px;
 }
 
@@ -83,7 +84,7 @@ main button {
     border: none;
     border-radius: 4px;
     padding: 12px 20px;
-    background-color: #1a73e8;
+    background-color: #202124;
     color: #ffffff;
     font-size: 14px;
     font-weight: 500;
@@ -92,7 +93,7 @@ main button {
 }
 
 main button:hover {
-    background-color: #1765c1;
+    background-color: #3c4043;
 }
 
 main button:disabled {
@@ -147,12 +148,12 @@ main .logout-form button:hover {
 
 .task-card {
     width: 100%;
-    height: 220px;
     min-width: 0;
+    min-height: 180px;
     box-sizing: border-box;
     border: 1px solid #ccc;
     border-radius: 10px;
-    padding: 25px;
+    padding: 30px;
     background-color: #f5f5f5;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
     position: relative;
@@ -195,7 +196,7 @@ main .logout-form button:hover {
 
 .task-menu {
     position: absolute;
-    top: 15px;
+    top: 25px;
     right: 15px;
 }
 
@@ -263,11 +264,13 @@ main .logout-form button:hover {
 }
 
 .priority-badge.LOW {
-    background-color: green;
+    background-color: #e2e8f0;
+    color: #475569;
 }
 
 .priority-badge.MED {
-    background-color: orange;
+    background-color: #f6d365;
+    color: #5f4500;
 }
 
 .priority-badge.HIGH {
@@ -402,11 +405,66 @@ main .logout-form button:hover {
     width: 100%;
     padding: 8px;
     margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
 }
 
 .modal-content form button {
     padding: 10px;
     cursor: pointer;
+}
+
+.modal-content form button[type="submit"] {
+    background-color: #202124;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    padding: 10px;
+}
+
+.modal-content form button[type="submit"]:hover {
+    background-color: #3c4043;
+}
+
+.delete-modal-content {
+    padding-top: 10px;
+}
+
+.delete-modal-content p {
+    margin-bottom: 25px;
+}
+
+.delete-modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.delete-modal-buttons button {
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.delete-modal-buttons .cancel-button {
+    background-color: #ffffff;
+    color: #202124;
+    border: 1px solid #202124;
+}
+
+.delete-modal-buttons .cancel-button:hover {
+    background-color: #f2f2f2;
+}
+
+.delete-confirm-button {
+    background-color: #d93025 !important;
+    color: #ffffff !important;
+    border: 1px solid #d93025 !important;
+}
+
+.delete-confirm-button:hover {
+    background-color: #b3261e !important;
+    border-color: #b3261e !important;
 }
 
 
@@ -447,11 +505,18 @@ main .logout-form button:hover {
 }
 
 .undo-popup button {
-    border: none;
-    background: none;
-    color: #1a73e8;
+    border: 1px solid #202124;
+    border-radius: 4px;
+    background-color: #ffffff;
+    color: #202124;
+    padding: 6px 12px;
     font-weight: bold;
     cursor: pointer;
+}
+
+.undo-popup button:hover {
+    background-color: #202124;
+    color: #ffffff;
 }
 
 
@@ -504,29 +569,33 @@ main .logout-form button:hover {
 
 .cancel-button {
     background-color: #ffffff;
-    color: #1a73e8;
-    border: 1px solid #dadce0;
+    color: #202124;
+    border: 1px solid #202124;
 }
 
 .cancel-button:hover {
-    background-color: #f8f9fa;
+    background-color: #f2f2f2;
 }
 
 .confirm-button {
-    background-color: #1a73e8;
+    background-color: #202124;
     color: #ffffff;
+}
+
+.confirm-button:hover {
+    background-color: #3c4043;
 }
 
 .logout-button {
     background-color: #ffffff;
-    color: #1a73e8;
-    border: 1px solid #dadce0;
+    color: #202124;
+    border: 1px solid #202124;
 }
 
 .logout-button:hover {
-    background-color: #d93025;
+    background-color: #3c4043;
     color: #ffffff;
-    border-color: #d93025;
+    border-color: #3c4043;
 }
 
 
@@ -604,51 +673,6 @@ main .logout-form button:hover {
     object-fit: contain;
 }
 
-/* LIST TITLE DROPDOWN */
-.list-title-section form {
-    margin: 0;
-}
-
-.list-title-dropdown {
-    appearance: none;
-    -webkit-appearance: none;
-
-    font-family: inherit;
-    font-size: 28px;
-    font-weight: 700;
-    color: #202124;
-
-    background-color: transparent;
-    border: none;
-    border-radius: 6px;
-
-    /* Space for the dropdown arrow */
-    padding: 5px 32px 5px 0;
-
-    /* Custom dropdown arrow */
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23202124' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right center;
-
-    cursor: pointer;
-    max-width: 100%;
-}
-
-.list-title-dropdown:hover {
-    color: #555;
-}
-
-.list-title-dropdown:focus-visible {
-    outline: 2px solid #888;
-    outline-offset: 4px;
-}
-
-.list-title-dropdown option {
-    font-size: 16px;
-    font-weight: 400;
-    color: #202124;
-    background-color: #fff;
-}
 
 /* ==================== LIST TITLE AND DROPDOWN ==================== */
 
@@ -677,6 +701,12 @@ main .logout-form button:hover {
     border-radius: 6px;
     background-color: white;
     cursor: pointer;
+}
+
+.list-dropdown-button img {
+    width: 28px;
+    height: 28px;
+    display: block;
 }
 
 .list-dropdown-button:hover {
@@ -957,26 +987,167 @@ main .logout-form button:hover {
     text-decoration: none;
 }
 
-/* Hover tooltip */
-.back-button::after {
-    content: "Back to To-Do List";
-    position: absolute;
-    top: 50%;
-    right: calc(100% + 8px);
-    transform: translateY(-50%);
-    background-color: #333;
-    color: white;
-    padding: 7px 10px;
-    border-radius: 5px;
-    font-size: 12px;
-    white-space: nowrap;
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 0.2s ease;
+.back-button:hover img {
+    filter: brightness(0) invert(1);
 }
 
-.back-button:hover::after {
-    opacity: 1;
-    visibility: visible;
+
+/* ==================== PASSWORD ==================== */
+
+.password-requirements {
+    margin-top: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+}
+
+.password-requirements p {
+    margin: 0 0 8px;
+    font-weight: 600;
+}
+
+.password-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 5px 0;
+}
+
+.check-light {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background-color: #808080;
+    flex-shrink: 0;
+}
+
+.check-light.valid {
+    background-color: #28a745;
+}
+
+.password-valid {
+    color: #28a745;
+}
+
+/* ==================== 404 PAGE ==================== */
+
+.error-page {
+    text-align: center;
+}
+
+.error-page .back-button {
+    display: block;
+    width: 180px;
+    margin: 20px auto 0;
+    padding: 10px 15px;
+    background-color: #202124;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.back-button:hover {
+    background-color: #3c4043;
+}
+
+/* ==================== FILTER BAR ==================== */
+
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 20px 30px;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.filter-select {
+    position: relative;
+}
+
+.filter-bar select {
+    appearance: none;
+    -webkit-appearance: none;
+
+    padding: 10px 40px 10px 12px;
+    border: 1px solid #dadce0;
+    border-radius: 6px;
+    background-color: #ffffff;
+    color: #202124;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.filter-select::after {
+    content: "";
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background-image: url("/static/images/dropdown_icon.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    pointer-events: none;
+}
+
+.filter-bar select:focus {
+    outline: none;
+    border-color: #202124;
+}
+
+.filter-bar button {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    background-color: #202124;
+    color: #ffffff;
+    cursor: pointer;
+}
+
+.filter-bar button:hover {
+    background-color: #3c4043;
+}
+
+/* ==================== PASSWORD EYE ==================== */
+
+.password-input {
+    position: relative;
+}
+
+.password-input input {
+    width: 100%;
+    padding-right: 40px;
+}
+
+.password-input button {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    width: 32px;
+    height: 32px;
+
+    border: none;
+    background: none;
+    padding: 6px;
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.password-input button img {
+    width: 20px;
+    height: 20px;
 }

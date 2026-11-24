@@ -125,6 +125,46 @@
 
     </div>
 
+    <!-- ==================== DELETE CONFIRMATION MODAL ==================== -->
+
+    <div class="modal" id="delete-modal">
+
+        <div class="modal-content delete-modal-content">
+
+            <h2>Delete Task</h2>
+
+            <p>
+                Are you sure you want to delete
+                <strong id="delete-task-title"></strong>?
+            </p>
+
+            <form id="delete-form" method="POST">
+
+                <!-- Preserve current sorting and filtering -->
+                <input type="hidden" name="sort" value="{{ sort }}">
+                <input type="hidden" name="priority_filter" value="{{ priority }}">
+                <input type="hidden" name="category_filter" value="{{ category }}">
+
+                <div class="delete-modal-buttons">
+
+                    <button type="button"
+                            class="cancel-button"
+                            id="cancel-delete">
+                        Cancel
+                    </button>
+
+                    <button type="submit" class="delete-confirm-button">
+                        Delete
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
 
 
     <!-- ==================== PAGE HEADER ==================== -->
@@ -147,7 +187,8 @@
                 <button type="button"
                         id="list-dropdown-button"
                         class="list-dropdown-button">
-                    ▼
+                    <img src="{{ url_for('static', filename='images/dropdown_icon.png') }}"
+                        alt="">
                 </button>
 
                 <div class="list-dropdown-menu" id="list-dropdown-menu">
@@ -180,11 +221,11 @@
 
         <!-- My Profile -->
         <div class="header-actions">
-            <a href="/profile" class="profile-button">
+            <a href="/profile" class="profile-button" title="View Account Information">
                 <img src="{{ url_for('static', filename='images/profile_icon.png') }}"
                     alt=""
                     class="profile-icon">
-                <span>My Profile</span>
+                <span>{{ user_display_name }}</span>
             </a>
         </div>
 
@@ -271,94 +312,98 @@
 
     <!-- ==================== SORT AND FILTER ==================== -->
 
-    <form action="/" method="GET">
+    <form action="/" method="GET" class="filter-bar">
+        <div class="filter-group">
+            <!-- Sort tasks -->
+            <label for="sort">Sort by:</label>
+            <div class="filter-select">
+                <select name="sort" id="sort" onchange="this.form.submit()">
 
-        <!-- Sort tasks -->
-        <label for="sort">Sort by:</label>
+                    <option value="created_at"
+                        {% if sort == "created_at" %} selected {% endif %}>
+                        Date Added
+                    </option>
 
-        <select name="sort" id="sort">
+                    <option value="due_date"
+                        {% if sort == "due_date" %} selected {% endif %}>
+                        Due Date
+                    </option>
 
-            <option value="created_at"
-                {% if sort == "created_at" %} selected {% endif %}>
-                Date Added
-            </option>
+                    <option value="priority"
+                        {% if sort == "priority" %} selected {% endif %}>
+                        Priority
+                    </option>
 
-            <option value="due_date"
-                {% if sort == "due_date" %} selected {% endif %}>
-                Due Date
-            </option>
+                    <option value="category"
+                        {% if sort == "category" %} selected {% endif %}>
+                        Category
+                    </option>
 
-            <option value="priority"
-                {% if sort == "priority" %} selected {% endif %}>
-                Priority
-            </option>
+                </select>
+            </div>
+        </div>
 
-            <option value="category"
-                {% if sort == "category" %} selected {% endif %}>
-                Category
-            </option>
+        <div class="filter-group">
+            <!-- Filter tasks by priority -->
+            <label for="priority">Filter by Priority:</label>
+            <div class="filter-select">
+                <select name="priority" id="priority" onchange="this.form.submit()">
 
-        </select>
+                    <option value=""
+                        {% if priority == "" %} selected {% endif %}>
+                        All Priorities
+                    </option>
 
+                    <option value="LOW"
+                        {% if priority == "LOW" %} selected {% endif %}>
+                        Low
+                    </option>
 
-        <!-- Filter tasks by priority -->
-        <label for="priority">Filter by Priority:</label>
+                    <option value="MED"
+                        {% if priority == "MED" %} selected {% endif %}>
+                        Medium
+                    </option>
 
-        <select name="priority" id="priority">
+                    <option value="HIGH"
+                        {% if priority == "HIGH" %} selected {% endif %}>
+                        High
+                    </option>
 
-            <option value=""
-                {% if priority == "" %} selected {% endif %}>
-                All Priorities
-            </option>
-
-            <option value="LOW"
-                {% if priority == "LOW" %} selected {% endif %}>
-                Low
-            </option>
-
-            <option value="MED"
-                {% if priority == "MED" %} selected {% endif %}>
-                Medium
-            </option>
-
-            <option value="HIGH"
-                {% if priority == "HIGH" %} selected {% endif %}>
-                High
-            </option>
-
-        </select>
-
-
-        <!-- Filter tasks by category -->
-        <label for="category">Filter by Category:</label>
-
-        <select name="category" id="category">
-
-            <option value=""
-                {% if category == "" %} selected {% endif %}>
-                All Categories
-            </option>
-
-            <option value="School"
-                {% if category == "School" %} selected {% endif %}>
-                School
-            </option>
-
-            <option value="Personal"
-                {% if category == "Personal" %} selected {% endif %}>
-                Personal
-            </option>
-
-            <option value="Others"
-                {% if category == "Others" %} selected {% endif %}>
-                Others
-            </option>
-
-        </select>
+                </select>
+            </div>
+        </div>
 
 
-        <!-- Apply selected sort and filters -->
-        <button type="submit">Apply</button>
+        <div class="filter-group">
+            <!-- Filter tasks by category -->
+            <label for="category">Filter by Category:</label>
+
+            <div class="filter-select">
+                <select name="category" id="category" onchange="this.form.submit()">
+
+                    <option value=""
+                        {% if category == "" %} selected {% endif %}>
+                        All Categories
+                    </option>
+
+                    <option value="School"
+                        {% if category == "School" %} selected {% endif %}>
+                        School
+                    </option>
+
+                    <option value="Personal"
+                        {% if category == "Personal" %} selected {% endif %}>
+                        Personal
+                    </option>
+
+                    <option value="Others"
+                        {% if category == "Others" %} selected {% endif %}>
+                        Others
+                    </option>
+
+                </select>
+            </div>
+        </div>
 
     </form>
 
@@ -502,10 +547,13 @@
 
 
                             <!-- Delete confirmation -->
-                            <button type="submit"
-                                    onclick="return confirm('Are you sure you want to delete this task?')">
+                            <button type="button"
+                                    class="delete-button"
+                                    data-id="{{ todo['id'] }}"
+                                    data-title="{{ todo['title'] }}">
                                 Delete
                             </button>
+
 
                         </form>
 

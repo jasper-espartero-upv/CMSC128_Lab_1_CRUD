@@ -276,3 +276,164 @@ if (openCollaboratorModal && closeCollaboratorModal && collaboratorModal) {
         }
     });
 }
+
+
+// ==================== PASSWORD REQUIREMENTS ====================
+
+const passwordInput =
+    document.getElementById("password") ||
+    document.getElementById("new_password");
+
+if (passwordInput) {
+
+    const isRegisterPassword = passwordInput.id === "password" &&
+        document.getElementById("password-status");
+
+    const isProfilePassword = passwordInput.id === "new_password";
+
+    function isPasswordValid(password) {
+        return (
+            password.length >= 8 &&
+            /[A-Z]/.test(password) &&
+            /[a-z]/.test(password) &&
+            /[0-9]/.test(password) &&
+            /[^A-Za-z0-9]/.test(password)
+        );
+    }
+
+    // Only show password requirements on Register/Profile.
+    if (isRegisterPassword || isProfilePassword) {
+
+        passwordInput.addEventListener("input", function () {
+            const password = passwordInput.value;
+
+            updatePasswordCheck(
+                "length-check",
+                password.length >= 8
+            );
+
+            updatePasswordCheck(
+                "uppercase-check",
+                /[A-Z]/.test(password)
+            );
+
+            updatePasswordCheck(
+                "lowercase-check",
+                /[a-z]/.test(password)
+            );
+
+            updatePasswordCheck(
+                "number-check",
+                /[0-9]/.test(password)
+            );
+
+            updatePasswordCheck(
+                "special-check",
+                /[^A-Za-z0-9]/.test(password)
+            );
+
+            const allValid = isPasswordValid(password);
+            const status = document.getElementById("password-status");
+
+            if (status) {
+                if (allValid) {
+                    status.textContent = "Password meets all requirements";
+                    status.classList.add("password-valid");
+                } else {
+                    status.textContent = "Password requirements:";
+                    status.classList.remove("password-valid");
+                }
+            }
+        });
+
+        const passwordForm = passwordInput.closest("form");
+
+        if (passwordForm) {
+            passwordForm.addEventListener("submit", function (event) {
+
+                // Profile: changing the password is optional.
+                if (passwordInput.id === "new_password" &&
+                    passwordInput.value === "") {
+                    return;
+                }
+
+                if (!isPasswordValid(passwordInput.value)) {
+                    event.preventDefault();
+
+                    const status =
+                        document.getElementById("password-status");
+
+                    if (status) {
+                        status.textContent =
+                            "Password does not meet all requirements.";
+                        status.classList.remove("password-valid");
+                    }
+
+                    passwordInput.focus();
+                }
+            });
+        }
+    }
+}
+
+function updatePasswordCheck(id, valid) {
+    const check = document.getElementById(id);
+
+    if (!check) {
+        return;
+    }
+
+    const light = check.querySelector(".check-light");
+
+    if (valid) {
+        light.classList.add("valid");
+    } else {
+        light.classList.remove("valid");
+    }
+}
+
+// ==================== PASSWORD VISIBILITY ====================
+
+document.querySelectorAll(".toggle-password").forEach(function (button) {
+    button.addEventListener("click", function () {
+        const password = document.getElementById(button.dataset.target);
+        const icon = button.querySelector("img");
+
+        if (password.type === "password") {
+            password.type = "text";
+            icon.src = "/static/images/eye_off_icon.png";
+        } else {
+            password.type = "password";
+            icon.src = "/static/images/eye_icon.png";
+        }
+    });
+});
+
+// ==================== DELETE MODAL ====================
+
+const deleteModal = document.getElementById("delete-modal");
+const cancelDelete = document.getElementById("cancel-delete");
+const deleteForm = document.getElementById("delete-form");
+const deleteTaskTitle = document.getElementById("delete-task-title");
+
+document.querySelectorAll(".delete-button").forEach(function (button) {
+    button.addEventListener("click", function () {
+        const todoId = button.dataset.id;
+        const todoTitle = button.dataset.title;
+
+        deleteTaskTitle.textContent = todoTitle;
+        deleteForm.action = "/delete/" + todoId;
+
+        deleteModal.style.display = "flex";
+    });
+});
+
+cancelDelete.addEventListener("click", function () {
+    deleteModal.style.display = "none";
+});
+
+deleteModal.addEventListener("click", function (event) {
+    if (event.target === deleteModal) {
+        deleteModal.style.display = "none";
+    }
+});

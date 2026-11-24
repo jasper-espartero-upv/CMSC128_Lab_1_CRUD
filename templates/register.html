@@ -37,22 +37,79 @@
             >
 
             <label for="password">Password</label>
-            <input
-                type="password"
-                id="password"
-                name="password"
-                minlength="8"
-                required
-            >
+
+            <div class="password-input">
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    minlength="8"
+                    required
+                >
+
+                <button
+                    type="button"
+                    class="toggle-password"
+                    data-target="password"
+                >
+                    <img
+                        src="{{ url_for('static', filename='images/eye_icon.png') }}"
+                        alt=""
+                    >
+                </button>
+            </div>
+
+            <div class="password-requirements">
+                <p id="password-status">Password requirements:</p>
+
+                <div id="length-check" class="password-check">
+                    <span class="check-light"></span>
+                    <span>At least 8 characters</span>
+                </div>
+
+                <div id="uppercase-check" class="password-check">
+                    <span class="check-light"></span>
+                    <span>Uppercase letter</span>
+                </div>
+
+                <div id="lowercase-check" class="password-check">
+                    <span class="check-light"></span>
+                    <span>Lowercase letter</span>
+                </div>
+
+                <div id="number-check" class="password-check">
+                    <span class="check-light"></span>
+                    <span>Number</span>
+                </div>
+
+                <div id="special-check" class="password-check">
+                    <span class="check-light"></span>
+                    <span>Special character</span>
+                </div>
+            </div>
 
             <label for="confirm_password">Confirm Password</label>
-            <input
-                type="password"
-                id="confirm_password"
-                name="confirm_password"
-                minlength="8"
-                required
-            >
+
+            <div class="password-input">
+                <input
+                    type="password"
+                    id="confirm_password"
+                    name="confirm_password"
+                    minlength="8"
+                    required
+                >
+
+                <button
+                    type="button"
+                    class="toggle-password"
+                    data-target="confirm_password"
+                >
+                    <img
+                        src="{{ url_for('static', filename='images/eye_icon.png') }}"
+                        alt=""
+                    >
+                </button>
+            </div>
 
             <button type="submit">
                 Register
@@ -72,8 +129,9 @@
         </div>
 
     </main>
-    
+
     <script src="{{ url_for('static', filename='script.js') }}"></script>
+
 </body>
 
 </html>
