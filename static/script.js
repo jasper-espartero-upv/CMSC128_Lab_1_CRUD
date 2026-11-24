@@ -280,7 +280,9 @@ if (openCollaboratorModal && closeCollaboratorModal && collaboratorModal) {
 
 // ==================== PASSWORD REQUIREMENTS ====================
 
-const passwordInput = document.getElementById("password");
+const passwordInput =
+    document.getElementById("password") ||
+    document.getElementById("new_password");
 
 if (passwordInput) {
     passwordInput.addEventListener("input", function () {
@@ -320,18 +322,25 @@ if (passwordInput) {
 
         const status = document.getElementById("password-status");
 
-        if (allValid) {
-            status.textContent = "Password meets all requirements";
-            status.classList.add("password-valid");
-        } else {
-            status.textContent = "Password requirements:";
-            status.classList.remove("password-valid");
+        if (status) {
+            if (allValid) {
+                status.textContent = "Password meets all requirements";
+                status.classList.add("password-valid");
+            } else {
+                status.textContent = "Password requirements:";
+                status.classList.remove("password-valid");
+            }
         }
     });
 }
 
 function updatePasswordCheck(id, valid) {
     const check = document.getElementById(id);
+
+    if (!check) {
+        return;
+    }
+
     const light = check.querySelector(".check-light");
 
     if (valid) {
